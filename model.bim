@@ -1,0 +1,4733 @@
+{
+  "compatibilityLevel": 1567,
+  "model": {
+    "annotations": [
+      {
+        "name": "PBIDesktopVersion",
+        "value": "2.124.1554.0 (23.12)"
+      },
+      {
+        "name": "PBI_QueryOrder",
+        "value": "[\"SharePointConection\",\"KontoPostKodRef\",\"ValutaKodRef\",\"MonthListSCBDyn\",\"MonthListSCBDynPrevMonth\",\"InterestRatesSnitt\",\"DimBanksNew\",\"Parameter1\",\"Transform Sample File\",\"Sample File\",\"Transform File\",\"InstitutsKodList\",\"MarknadsandelGrund\",\"InstitutsGrupp\",\"Institut\",\"Valuta\",\"MarknadenTotalt\",\"OvrigaAktorar\",\"Marknadsandel\",\"Kontopost\",\"LastRefresh\",\"Kalender\",\"InterestRates\",\"MarknadsandelGrund (2)\"]"
+      },
+      {
+        "name": "__PBI_TimeIntelligenceEnabled",
+        "value": "1"
+      },
+      {
+        "name": "PBI_ProTooling",
+        "value": "[\"DevMode\",\"CalcGroup\",\"DaxQueryView_Desktop\"]"
+      }
+    ],
+    "culture": "en-US",
+    "cultures": [
+      {
+        "name": "en-US",
+        "linguisticMetadata": {
+          "content": {
+            "DynamicImprovement": "HighConfidence",
+            "Language": "en-US",
+            "Version": "1.0.0"
+          },
+          "contentType": "json"
+        }
+      }
+    ],
+    "dataAccessOptions": {
+      "fastCombine": true,
+      "legacyRedirects": true,
+      "returnErrorValuesAsNull": true
+    },
+    "defaultPowerBIDataSourceVersion": "powerBI_V3",
+    "discourageImplicitMeasures": true,
+    "expressions": [
+      {
+        "name": "MonthListSCBDyn",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Text"
+          }
+        ],
+        "expression": [
+          "let",
+          "    Source = { Number.From( #date( 2012,1,1) ) .. Number.From( #date( Date.Year(Date.From(Date.AddMonths(DateTime.LocalNow(), -1))), Date.Month(Date.From(Date.AddMonths(DateTime.LocalNow() , -1)))  , Date.Day( Date.From(Date.AddMonths(DateTime.LocalNow(), -1 )))) ) },",
+          "    #\"Converted to Table\" = Table.FromList(Source, Splitter.SplitByNothing(), null, null, ExtraValues.Error),",
+          "    #\"Changed Type\" = Table.TransformColumnTypes(#\"Converted to Table\",{{\"Column1\", type date}}),",
+          "    #\"Inserted Year\" = Table.AddColumn(#\"Changed Type\", \"Year\", each Date.Year([Column1]), Int64.Type),",
+          "    #\"Inserted Month\" = Table.AddColumn(#\"Inserted Year\", \"Month\", each Date.Month([Column1]), Int64.Type),",
+          "    #\"Added Custom\" = Table.AddColumn(#\"Inserted Month\", \"YearMonth\", each if [Month] > 9 then Number.ToText( [Year] ) & \"M\" & Number.ToText( [Month] ) else Number.ToText( [Year] ) & \"M0\" & Number.ToText( [Month] ), type text),",
+          "    #\"Removed Duplicates\" = Table.Distinct(#\"Added Custom\", {\"YearMonth\"}),",
+          "    #\"Added Custom1\" = Table.AddColumn(#\"Removed Duplicates\", \"YearMonthWithQM\", each \"\"\"\" & [YearMonth] & \"\"\"\", type text),",
+          "    #\"Removed Other Columns\" = Table.SelectColumns(#\"Added Custom1\",{\"YearMonthWithQM\"}),",
+          "    #\"Added Custom2\" = Table.AddColumn(#\"Removed Other Columns\", \"ToGroup\", each 1),",
+          "    #\"Grouped Rows\" = Table.Group(#\"Added Custom2\", {\"ToGroup\"}, {{\"NewColumn\", each _, type table [YearMonthWithQM=text, ToGroup=number]}}),",
+          "    #\"Added Custom3\" = Table.AddColumn(#\"Grouped Rows\", \"Custom\", each [NewColumn][YearMonthWithQM]),",
+          "    #\"Removed Other Columns1\" = Table.SelectColumns(#\"Added Custom3\",{\"Custom\"}),",
+          "    #\"Extracted Values\" = Table.TransformColumns(#\"Removed Other Columns1\", {\"Custom\", each Text.Combine(List.Transform(_, Text.From), \",\" ), type text}),",
+          "    Custom = #\"Extracted Values\"{0}[Custom]",
+          "in",
+          "    Custom"
+        ],
+        "kind": "m",
+        "lineageTag": "a97cfcb1-6299-4fdc-843f-2026e5f733df"
+      },
+      {
+        "name": "MonthListSCBDynPrevMonth",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Text"
+          }
+        ],
+        "expression": [
+          "let",
+          "    Source = { Number.From( #date( 2012,1,1) ) .. Number.From( #date( Date.Year(Date.From(Date.AddMonths(DateTime.LocalNow(), -2))), Date.Month(Date.From(Date.AddMonths(DateTime.LocalNow() , -2)))  , Date.Day( Date.From(Date.AddMonths(DateTime.LocalNow(), -2 )))) ) },",
+          "    #\"Converted to Table\" = Table.FromList(Source, Splitter.SplitByNothing(), null, null, ExtraValues.Error),",
+          "    #\"Changed Type\" = Table.TransformColumnTypes(#\"Converted to Table\",{{\"Column1\", type date}}),",
+          "    #\"Inserted Year\" = Table.AddColumn(#\"Changed Type\", \"Year\", each Date.Year([Column1]), Int64.Type),",
+          "    #\"Inserted Month\" = Table.AddColumn(#\"Inserted Year\", \"Month\", each Date.Month([Column1]), Int64.Type),",
+          "    #\"Added Custom\" = Table.AddColumn(#\"Inserted Month\", \"YearMonth\", each if [Month] > 9 then Number.ToText( [Year] ) & \"M\" & Number.ToText( [Month] ) else Number.ToText( [Year] ) & \"M0\" & Number.ToText( [Month] ), type text),",
+          "    #\"Removed Duplicates\" = Table.Distinct(#\"Added Custom\", {\"YearMonth\"}),",
+          "    #\"Added Custom1\" = Table.AddColumn(#\"Removed Duplicates\", \"YearMonthWithQM\", each \"\"\"\" & [YearMonth] & \"\"\"\", type text),",
+          "    #\"Removed Other Columns\" = Table.SelectColumns(#\"Added Custom1\",{\"YearMonthWithQM\"}),",
+          "    #\"Added Custom2\" = Table.AddColumn(#\"Removed Other Columns\", \"ToGroup\", each 1),",
+          "    #\"Grouped Rows\" = Table.Group(#\"Added Custom2\", {\"ToGroup\"}, {{\"NewColumn\", each _, type table [YearMonthWithQM=text, ToGroup=number]}}),",
+          "    #\"Added Custom3\" = Table.AddColumn(#\"Grouped Rows\", \"Custom\", each [NewColumn][YearMonthWithQM]),",
+          "    #\"Removed Other Columns1\" = Table.SelectColumns(#\"Added Custom3\",{\"Custom\"}),",
+          "    #\"Extracted Values\" = Table.TransformColumns(#\"Removed Other Columns1\", {\"Custom\", each Text.Combine(List.Transform(_, Text.From), \",\" ), type text}),",
+          "    Custom = #\"Extracted Values\"{0}[Custom]",
+          "in",
+          "    Custom"
+        ],
+        "kind": "m",
+        "lineageTag": "d4a50508-4cc2-4dc7-aa69-c3d9b70b1650"
+      },
+      {
+        "name": "SharePointConection",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "expression": [
+          "let",
+          "    Source = SharePoint.Files(\"https://skandianet-my.sharepoint.com/personal/aleksandar_kovacevic_skandia_se\", [ApiVersion = 15]),",
+          "    #\"Filtered Rows\" = Table.SelectRows(Source, each ([Extension] = \".xlsx\") and ([Name] = \"DimInstitut.xlsx\" or [Name] = \"InterestRates.xlsx\")),",
+          "    #\"Removed Other Columns\" = Table.SelectColumns(#\"Filtered Rows\",{\"Content\"}),",
+          "    #\"Filtered Hidden Files1\" = Table.SelectRows(#\"Removed Other Columns\", each [Attributes]?[Hidden]? <> true),",
+          "    #\"Invoke Custom Function1\" = Table.AddColumn(#\"Filtered Hidden Files1\", \"Transform File\", each #\"Transform File\"([Content])),",
+          "    #\"Removed Other Columns1\" = Table.SelectColumns(#\"Invoke Custom Function1\", {\"Transform File\"}),",
+          "    #\"Expanded Table Column1\" = Table.ExpandTableColumn(#\"Removed Other Columns1\", \"Transform File\", Table.ColumnNames(#\"Transform File\"(#\"Sample File\"))),",
+          "    #\"Changed Type\" = Table.TransformColumnTypes(#\"Expanded Table Column1\",{{\"Name\", type text}, {\"Data\", type any}, {\"Item\", type text}, {\"Kind\", type text}, {\"Hidden\", type logical}})",
+          "in",
+          "    #\"Changed Type\""
+        ],
+        "kind": "m",
+        "lineageTag": "1cdf165c-be6f-4c27-a7dd-5a7ba1888063"
+      },
+      {
+        "name": "DimBanksNew",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "expression": [
+          "let",
+          "    Source = SharePointConection,",
+          "    #\"Filtered Rows\" = Table.SelectRows(Source, each ([Name] = \"DimBanks\")),",
+          "    #\"Removed Other Columns\" = Table.SelectColumns(#\"Filtered Rows\",{\"Data\"}),",
+          "    #\"Expanded Data\" = Table.ExpandTableColumn(#\"Removed Other Columns\", \"Data\", {\"Column1\", \"Column2\", \"Column3\", \"Column4\"}, {\"Data.Column1\", \"Data.Column2\", \"Data.Column3\", \"Data.Column4\"}),",
+          "    #\"Promoted Headers\" = Table.PromoteHeaders(#\"Expanded Data\", [PromoteAllScalars=true]),",
+          "    #\"Changed Type\" = Table.TransformColumnTypes(#\"Promoted Headers\",{{\"Bank\", type text}, {\"IsDirectConcurrent\", Int64.Type}, {\"IsFyraStora\", Int64.Type}, {\"InstitutsKod\", type text}}),",
+          "    #\"Renamed Columns\" = Table.RenameColumns(#\"Changed Type\",{{\"InstitutsKod\", \"InstitutsdetaljKod\"}})",
+          "in",
+          "    #\"Renamed Columns\""
+        ],
+        "kind": "m",
+        "lineageTag": "908d8b31-fae7-4e3a-be48-fc8afb7bf9c0"
+      },
+      {
+        "name": "Parameter1",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Binary"
+          }
+        ],
+        "expression": "#\"Sample File\" meta [IsParameterQuery=true, BinaryIdentifier=#\"Sample File\", Type=\"Binary\", IsParameterQueryRequired=true]",
+        "kind": "m",
+        "lineageTag": "d4af3e63-665e-41ba-9714-13985abf8485",
+        "queryGroup": "Transform File from Query1\\Helper Queries"
+      },
+      {
+        "name": "Transform Sample File",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "expression": [
+          "let",
+          "    Source = Excel.Workbook(Parameter1, null, true)",
+          "in",
+          "    Source"
+        ],
+        "kind": "m",
+        "lineageTag": "baca57be-3523-4da8-a974-9da606aa797d",
+        "queryGroup": "Transform File from Query1"
+      },
+      {
+        "name": "Sample File",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Binary"
+          }
+        ],
+        "expression": [
+          "let",
+          "    Source = SharePoint.Files(\"https://skandianet-my.sharepoint.com/personal/aleksandar_kovacevic_skandia_se\", [ApiVersion = 15]),",
+          "    #\"Filtered Rows\" = Table.SelectRows(Source, each ([Extension] = \".xlsx\") and ([Name] = \"DimInstitut.xlsx\")),",
+          "    #\"Removed Other Columns\" = Table.SelectColumns(#\"Filtered Rows\",{\"Content\"}),",
+          "    Navigation1 = #\"Removed Other Columns\"{0}[Content]",
+          "in",
+          "    Navigation1"
+        ],
+        "kind": "m",
+        "lineageTag": "e14182a1-0920-425d-ac63-0ece955c73a3",
+        "queryGroup": "Transform File from Query1\\Helper Queries"
+      },
+      {
+        "name": "Transform File",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Function"
+          }
+        ],
+        "expression": [
+          "let",
+          "    Source = (Parameter1 as binary) => let",
+          "    Source = Excel.Workbook(Parameter1, null, true)",
+          "in",
+          "    Source",
+          "in",
+          "    Source"
+        ],
+        "kind": "m",
+        "lineageTag": "658da2d8-3ddd-4eb4-8629-546c47c835e9",
+        "mAttributes": "[ FunctionQueryBinding = \"{\"\"exemplarFormulaName\"\":\"\"Transform Sample File\"\"}\" ]",
+        "queryGroup": "Transform File from Query1\\Helper Queries"
+      },
+      {
+        "name": "InterestRatesSnitt",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "expression": [
+          "let",
+          "    Source = SharePointConection,",
+          "    #\"Filtered Rows\" = Table.SelectRows(Source, each ([Name] = \"FactAvgInterestRate3Months\")),",
+          "    #\"Removed Other Columns\" = Table.SelectColumns(#\"Filtered Rows\",{\"Data\"}),",
+          "    #\"Expanded Data\" = Table.ExpandTableColumn(#\"Removed Other Columns\", \"Data\", {\"Column1\", \"Column2\", \"Column3\"}, {\"Data.Column1\", \"Data.Column2\", \"Data.Column3\"}),",
+          "    #\"Promoted Headers\" = Table.PromoteHeaders(#\"Expanded Data\", [PromoteAllScalars=true]),",
+          "    #\"Changed Type\" = Table.TransformColumnTypes(#\"Promoted Headers\",{{\"Bank\", type text}, {\"Datum\", type date}, {\"InterestRateX1000000\", Int64.Type}}),",
+          "    #\"Merged Queries\" = Table.NestedJoin(#\"Changed Type\", {\"Bank\"}, DimBanksNew, {\"Bank\"}, \"DimBanksNew\", JoinKind.LeftOuter),",
+          "    #\"Expanded DimBanksNew\" = Table.ExpandTableColumn(#\"Merged Queries\", \"DimBanksNew\", {\"InstitutsdetaljKod\"}, {\"InstitutsdetaljKod\"}),",
+          "    #\"Removed Columns\" = Table.RemoveColumns(#\"Expanded DimBanksNew\",{\"Bank\"}),",
+          "    #\"Grouped Rows\" = Table.Group(#\"Removed Columns\", {\"Datum\"}, {{\"SnittRanta\", each List.Average([InterestRateX1000000]), type nullable number}})",
+          "in",
+          "    #\"Grouped Rows\""
+        ],
+        "kind": "m",
+        "lineageTag": "4354cbc7-d2c8-4677-9c13-b7200a589989"
+      },
+      {
+        "name": "InstitutsKodList",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Text"
+          }
+        ],
+        "expression": [
+          "let",
+          "    Source = Institut,",
+          "    #\"Removed Other Columns1\" = Table.SelectColumns(Source,{\"InstitutsDetaljKod\"}),",
+          "    #\"Removed Duplicates\" = Table.Distinct(#\"Removed Other Columns1\"),",
+          "    #\"Filtered Rows\" = Table.SelectRows(#\"Removed Duplicates\", each ([InstitutsDetaljKod] <> \"OVGAKT\")),",
+          "    #\"Added Custom1\" = Table.AddColumn(#\"Filtered Rows\", \"InstitutsKodMedQM\", each \"\"\"\" & [InstitutsDetaljKod] & \"\"\"\", type text),",
+          "    #\"Removed Columns\" = Table.RemoveColumns(#\"Added Custom1\",{\"InstitutsDetaljKod\"}),",
+          "    #\"Added Custom\" = Table.AddColumn(#\"Removed Columns\", \"ToGroup\", each 1),",
+          "    #\"Grouped Rows\" = Table.Group(#\"Added Custom\", {\"ToGroup\"}, {{\"New\", each _, type table [InstitutsKodMedQM=text, ToGroup=number]}}),",
+          "    #\"Added Custom2\" = Table.AddColumn(#\"Grouped Rows\", \"InstitutsKodList\", each [New][InstitutsKodMedQM]),",
+          "    #\"Removed Other Columns\" = Table.SelectColumns(#\"Added Custom2\",{\"InstitutsKodList\"}),",
+          "    #\"Extracted Values\" = Table.TransformColumns(#\"Removed Other Columns\", {\"InstitutsKodList\", each Text.Combine(List.Transform(_, Text.From), \",\"), type text}),",
+          "    InstitutsKodList1 = #\"Extracted Values\"{0}[InstitutsKodList]",
+          "in",
+          "    InstitutsKodList1"
+        ],
+        "kind": "m",
+        "lineageTag": "0d593d11-e359-4c55-8a97-7319d5db7a10",
+        "queryGroup": "Func"
+      },
+      {
+        "name": "InstitutsGrupp",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "expression": [
+          "let",
+          "    Source = SharePoint.Tables(\"https://skandianet-my.sharepoint.com/personal/aleksandar_kovacevic_skandia_se/\", [Implementation=\"2.0\", ViewMode=\"Default\"]),",
+          "    #\"c09b9b48-a38e-4aad-8ac1-3a0c89c71da3\" = Source{[Id=\"c09b9b48-a38e-4aad-8ac1-3a0c89c71da3\"]}[Items]",
+          "in",
+          "    #\"c09b9b48-a38e-4aad-8ac1-3a0c89c71da3\""
+        ],
+        "kind": "m",
+        "lineageTag": "9ad89af6-e1dd-4d2d-9bac-c4a1719234fe",
+        "queryGroup": "Func"
+      },
+      {
+        "name": "MarknadenTotalt",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "expression": [
+          "let",
+          "",
+          "  Content=\"{",
+          "    \"\"query\"\": [",
+          "      {",
+          "        \"\"code\"\": \"\"Institut\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"item\"\",",
+          "          \"\"values\"\": [",
+          "            \" & InstitutsKodList & \"",
+          "          ]",
+          "        }",
+          "      },",
+          "      {",
+          "        \"\"code\"\": \"\"Kontopost\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"vs:KontopostMFIA\"\",",
+          "          \"\"values\"\": [",
+          "            \" & KontoPostKodRef & \"",
+          "          ]",
+          "        }",
+          "      },",
+          "      {",
+          "        \"\"code\"\": \"\"Valuta\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"item\"\",",
+          "          \"\"values\"\": [",
+          "            \" & ValutaKodRef & \"",
+          "          ]",
+          "        }",
+          "      },",
+          "      {",
+          "        \"\"code\"\": \"\"Tid\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"item\"\",",
+          "          \"\"values\"\": [",
+          "            \" & MonthListSCBDyn & \"",
+          "          ]",
+          "        }",
+          "      }",
+          "    ],",
+          "    \"\"response\"\": {",
+          "      \"\"format\"\": \"\"json\"\"",
+          "    }",
+          "  }\",",
+          "",
+          "  ContentPreMonth=\"{",
+          "    \"\"query\"\": [",
+          "      {",
+          "        \"\"code\"\": \"\"Institut\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"item\"\",",
+          "          \"\"values\"\": [",
+          "            \" & InstitutsKodList & \"",
+          "          ]",
+          "        }",
+          "      },",
+          "      {",
+          "        \"\"code\"\": \"\"Kontopost\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"vs:KontopostMFIA\"\",",
+          "          \"\"values\"\": [",
+          "            \" & KontoPostKodRef & \"",
+          "          ]",
+          "        }",
+          "      },",
+          "      {",
+          "        \"\"code\"\": \"\"Valuta\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"item\"\",",
+          "          \"\"values\"\": [",
+          "            \" & ValutaKodRef & \"",
+          "          ]",
+          "        }",
+          "      },",
+          "      {",
+          "        \"\"code\"\": \"\"Tid\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"item\"\",",
+          "          \"\"values\"\": [",
+          "            \" & MonthListSCBDynPrevMonth & \"",
+          "          ]",
+          "        }",
+          "      }",
+          "    ],",
+          "    \"\"response\"\": {",
+          "      \"\"format\"\": \"\"json\"\"",
+          "    }",
+          "  }\",",
+          "",
+          "      Source = try Json.Document(Web.Contents(\"https://api.scb.se/OV0104/v1/doris/sv/ssd/START/FM/FM0401/FM0401X/MFIM1\", [Content=Text.ToBinary(Content)])) otherwise Json.Document(Web.Contents(\"https://api.scb.se/OV0104/v1/doris/sv/ssd/START/FM/FM0401/FM0401X/MFIM1\", [Content=Text.ToBinary(ContentPreMonth)])) ,",
+          "      #\"Converted to Table\" = Record.ToTable(Source),",
+          "      #\"Expanded Value\" = Table.ExpandListColumn(#\"Converted to Table\", \"Value\"),",
+          "      #\"Expanded Value1\" = Table.ExpandRecordColumn(#\"Expanded Value\", \"Value\", {\"code\", \"text\", \"type\", \"key\", \"values\", \"infofile\", \"updated\", \"label\", \"source\"}, {\"Value.code\", \"Value.text\", \"Value.type\", \"Value.key\", \"Value.values\", \"Value.infofile\", \"Value.updated\", \"Value.label\", \"Value.source\"}),",
+          "      #\"Expanded Value.key\" = Table.ExpandListColumn(#\"Expanded Value1\", \"Value.key\"),",
+          "      #\"Expanded Value.values\" = Table.ExpandListColumn(#\"Expanded Value.key\", \"Value.values\"),",
+          "      #\"Removed Other Columns\" = Table.SelectColumns(#\"Expanded Value.values\",{\"Value.key\", \"Value.values\"}),",
+          "      #\"Added Custom\" = Table.AddColumn(#\"Removed Other Columns\", \"Month\", each if Text.Middle([Value.key], 4, 1 ) = \"M\" then [Value.key] else null),",
+          "      #\"Added Custom1\" = Table.AddColumn(#\"Added Custom\", \"YYYYMMDD\", each Text.Start([Month],4) & Text.End([Month],2) & \"25\"),",
+          "    #\"Filled Down1\" = Table.FillUp(#\"Added Custom1\",{\"YYYYMMDD\"}),",
+          "    #\"Filtered Rows1\" = Table.SelectRows(#\"Filled Down1\", each ([Value.key] <> null) and ([Month] = null)),",
+          "    #\"Removed Columns1\" = Table.RemoveColumns(#\"Filtered Rows1\",{\"Month\"}),",
+          "    #\"Added Custom2\" = Table.AddColumn(#\"Removed Columns1\", \"ValutaKod\", each if Text.Start( [Value.key], 1 ) = \"v\" then [Value.key] else null),",
+          "    #\"Added Custom3\" = Table.AddColumn(#\"Added Custom2\", \"KontopostKod\", each if Text.Start( [Value.key], 1 ) = \"K\" then [Value.key] else null),",
+          "    #\"Added Custom4\" = Table.AddColumn(#\"Added Custom3\", \"InstitutsdetaljKod\", each if [ValutaKod] = null and [KontopostKod] = null then [Value.key] else null),",
+          "    #\"Filled Up\" = Table.FillUp(#\"Added Custom4\",{\"ValutaKod\"}),",
+          "    #\"Filled Down\" = Table.FillDown(#\"Filled Up\",{\"InstitutsdetaljKod\"}),",
+          "    #\"Filtered Rows\" = Table.SelectRows(#\"Filled Down\", each ([KontopostKod] <> null )),",
+          "    #\"Removed Columns2\" = Table.RemoveColumns(#\"Filtered Rows\",{\"Value.key\"}),",
+          "    #\"Renamed Columns1\" = Table.RenameColumns(#\"Removed Columns2\",{{\"Value.values\", \"Value\"}, {\"YYYYMMDD\", \"Datum\"}}),",
+          "    #\"Replaced Value\" = Table.ReplaceValue(#\"Renamed Columns1\",\"..\",\"0\",Replacer.ReplaceText,{\"Value\"}),",
+          "    #\"Changed Type2\" = Table.TransformColumnTypes(#\"Replaced Value\",{{\"Value\", type number}, {\"Datum\", type date}, {\"ValutaKod\", type text}, {\"KontopostKod\", type text}, {\"InstitutsdetaljKod\", type text}}),",
+          "",
+          "    #\"Filtered Rows5\" = Table.SelectRows(#\"Changed Type2\", each ([InstitutsdetaljKod] = \"S21\"))",
+          "in",
+          "    #\"Filtered Rows5\""
+        ],
+        "kind": "m",
+        "lineageTag": "ec988377-f5b2-4d5f-b200-3fb881a32e05",
+        "queryGroup": "Func"
+      },
+      {
+        "name": "OvrigaAktorar",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "expression": [
+          "let",
+          "",
+          "  Content=\"{",
+          "    \"\"query\"\": [",
+          "      {",
+          "        \"\"code\"\": \"\"Institut\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"item\"\",",
+          "          \"\"values\"\": [",
+          "            \" & InstitutsKodList & \"",
+          "          ]",
+          "        }",
+          "      },",
+          "      {",
+          "        \"\"code\"\": \"\"Kontopost\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"vs:KontopostMFIA\"\",",
+          "          \"\"values\"\": [",
+          "            \" & KontoPostKodRef & \"",
+          "          ]",
+          "        }",
+          "      },",
+          "      {",
+          "        \"\"code\"\": \"\"Valuta\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"item\"\",",
+          "          \"\"values\"\": [",
+          "            \" & ValutaKodRef & \"",
+          "          ]",
+          "        }",
+          "      },",
+          "      {",
+          "        \"\"code\"\": \"\"Tid\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"item\"\",",
+          "          \"\"values\"\": [",
+          "            \" & MonthListSCBDyn & \"",
+          "          ]",
+          "        }",
+          "      }",
+          "    ],",
+          "    \"\"response\"\": {",
+          "      \"\"format\"\": \"\"json\"\"",
+          "    }",
+          "  }\",",
+          "",
+          "  ContentPreMonth=\"{",
+          "    \"\"query\"\": [",
+          "      {",
+          "        \"\"code\"\": \"\"Institut\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"item\"\",",
+          "          \"\"values\"\": [",
+          "            \" & InstitutsKodList & \"",
+          "          ]",
+          "        }",
+          "      },",
+          "      {",
+          "        \"\"code\"\": \"\"Kontopost\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"vs:KontopostMFIA\"\",",
+          "          \"\"values\"\": [",
+          "            \" & KontoPostKodRef & \"",
+          "          ]",
+          "        }",
+          "      },",
+          "      {",
+          "        \"\"code\"\": \"\"Valuta\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"item\"\",",
+          "          \"\"values\"\": [",
+          "            \" & ValutaKodRef & \"",
+          "          ]",
+          "        }",
+          "      },",
+          "      {",
+          "        \"\"code\"\": \"\"Tid\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"item\"\",",
+          "          \"\"values\"\": [",
+          "            \" & MonthListSCBDynPrevMonth & \"",
+          "          ]",
+          "        }",
+          "      }",
+          "    ],",
+          "    \"\"response\"\": {",
+          "      \"\"format\"\": \"\"json\"\"",
+          "    }",
+          "  }\",",
+          "",
+          "      Source = try Json.Document(Web.Contents(\"https://api.scb.se/OV0104/v1/doris/sv/ssd/START/FM/FM0401/FM0401X/MFIM1\", [Content=Text.ToBinary(Content)])) otherwise Json.Document(Web.Contents(\"https://api.scb.se/OV0104/v1/doris/sv/ssd/START/FM/FM0401/FM0401X/MFIM1\", [Content=Text.ToBinary(ContentPreMonth)])) ,",
+          "      #\"Converted to Table\" = Record.ToTable(Source),",
+          "      #\"Expanded Value\" = Table.ExpandListColumn(#\"Converted to Table\", \"Value\"),",
+          "      #\"Expanded Value1\" = Table.ExpandRecordColumn(#\"Expanded Value\", \"Value\", {\"code\", \"text\", \"type\", \"key\", \"values\", \"infofile\", \"updated\", \"label\", \"source\"}, {\"Value.code\", \"Value.text\", \"Value.type\", \"Value.key\", \"Value.values\", \"Value.infofile\", \"Value.updated\", \"Value.label\", \"Value.source\"}),",
+          "      #\"Expanded Value.key\" = Table.ExpandListColumn(#\"Expanded Value1\", \"Value.key\"),",
+          "      #\"Expanded Value.values\" = Table.ExpandListColumn(#\"Expanded Value.key\", \"Value.values\"),",
+          "      #\"Removed Other Columns\" = Table.SelectColumns(#\"Expanded Value.values\",{\"Value.key\", \"Value.values\"}),",
+          "      #\"Added Custom\" = Table.AddColumn(#\"Removed Other Columns\", \"Month\", each if Text.Middle([Value.key], 4, 1 ) = \"M\" then [Value.key] else null),",
+          "      #\"Added Custom1\" = Table.AddColumn(#\"Added Custom\", \"YYYYMMDD\", each Text.Start([Month],4) & Text.End([Month],2) & \"25\"),",
+          "    #\"Filled Down1\" = Table.FillUp(#\"Added Custom1\",{\"YYYYMMDD\"}),",
+          "    #\"Filtered Rows1\" = Table.SelectRows(#\"Filled Down1\", each ([Value.key] <> null) and ([Month] = null)),",
+          "    #\"Removed Columns1\" = Table.RemoveColumns(#\"Filtered Rows1\",{\"Month\"}),",
+          "    #\"Added Custom2\" = Table.AddColumn(#\"Removed Columns1\", \"ValutaKod\", each if Text.Start( [Value.key], 1 ) = \"v\" then [Value.key] else null),",
+          "    #\"Added Custom3\" = Table.AddColumn(#\"Added Custom2\", \"KontopostKod\", each if Text.Start( [Value.key], 1 ) = \"K\" then [Value.key] else null),",
+          "    #\"Added Custom4\" = Table.AddColumn(#\"Added Custom3\", \"InstitutsdetaljKod\", each if [ValutaKod] = null and [KontopostKod] = null then [Value.key] else null),",
+          "    #\"Filled Up\" = Table.FillUp(#\"Added Custom4\",{\"ValutaKod\"}),",
+          "    #\"Filled Down\" = Table.FillDown(#\"Filled Up\",{\"InstitutsdetaljKod\"}),",
+          "    #\"Filtered Rows\" = Table.SelectRows(#\"Filled Down\", each ([KontopostKod] <> null )),",
+          "    #\"Removed Columns2\" = Table.RemoveColumns(#\"Filtered Rows\",{\"Value.key\"}),",
+          "    #\"Renamed Columns1\" = Table.RenameColumns(#\"Removed Columns2\",{{\"Value.values\", \"Value\"}, {\"YYYYMMDD\", \"Datum\"}}),",
+          "    #\"Replaced Value\" = Table.ReplaceValue(#\"Renamed Columns1\",\"..\",\"0\",Replacer.ReplaceText,{\"Value\"}),",
+          "    #\"Changed Type2\" = Table.TransformColumnTypes(#\"Replaced Value\",{{\"Value\", type number}, {\"Datum\", type date}, {\"ValutaKod\", type text}, {\"KontopostKod\", type text}, {\"InstitutsdetaljKod\", type text}}),",
+          "",
+          "    #\"Filtered Rows2\" = Table.SelectRows(#\"Changed Type2\", each ([InstitutsdetaljKod] <> \"S21\" and [InstitutsdetaljKod] <> \"s230\")),",
+          "    #\"Grouped Rows\" = Table.Group(#\"Filtered Rows2\", {\"Datum\", \"KontopostKod\", \"ValutaKod\"}, {{\"SumAllChoseInstitutPerDateAndKontopost\", each List.Sum([Value]), type nullable number}}),",
+          "    #\"Merged Queries\" = Table.NestedJoin(#\"Grouped Rows\", {\"Datum\", \"KontopostKod\", \"ValutaKod\"}, MarknadenTotalt, {\"Datum\", \"KontopostKod\", \"ValutaKod\"}, \"MarkanadenTotaltNewAAA\", JoinKind.LeftOuter),",
+          "    #\"Expanded MarkanadenTotaltNewAAA\" = Table.ExpandTableColumn(#\"Merged Queries\", \"MarkanadenTotaltNewAAA\", {\"Value\"}, {\"MarkanadenTotaltNewAAA.Value\"}),",
+          "    #\"Renamed Columns\" = Table.RenameColumns(#\"Expanded MarkanadenTotaltNewAAA\",{{\"MarkanadenTotaltNewAAA.Value\", \"MarkanadenTotalt\"}}),",
+          "    #\"Added Custom5\" = Table.AddColumn(#\"Renamed Columns\", \"Value\", each [MarkanadenTotalt] - [SumAllChoseInstitutPerDateAndKontopost]),",
+          "    #\"Added Custom6\" = Table.AddColumn(#\"Added Custom5\", \"InstitutsdetaljKod\", each \"OVGAKT\"),",
+          "    #\"Removed Columns\" = Table.RemoveColumns(#\"Added Custom6\",{\"SumAllChoseInstitutPerDateAndKontopost\", \"MarkanadenTotalt\"}),",
+          "    #\"Changed Type\" = Table.TransformColumnTypes(#\"Removed Columns\",{{\"Value\", type number}, {\"InstitutsdetaljKod\", type text}})",
+          "in",
+          "    #\"Changed Type\""
+        ],
+        "kind": "m",
+        "lineageTag": "c5a8ad60-9de3-4f76-8feb-d1de1e7356fb",
+        "queryGroup": "Func"
+      },
+      {
+        "name": "MarknadsandelGrund",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "expression": [
+          "let",
+          "",
+          "  Content=\"{",
+          "    \"\"query\"\": [",
+          "      {",
+          "        \"\"code\"\": \"\"Institut\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"item\"\",",
+          "          \"\"values\"\": [",
+          "            \" & InstitutsKodList & \"",
+          "          ]",
+          "        }",
+          "      },",
+          "      {",
+          "        \"\"code\"\": \"\"Kontopost\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"vs:KontopostMFIA\"\",",
+          "          \"\"values\"\": [",
+          "            \" & KontoPostKodRef & \"",
+          "          ]",
+          "        }",
+          "      },",
+          "      {",
+          "        \"\"code\"\": \"\"Valuta\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"item\"\",",
+          "          \"\"values\"\": [",
+          "            \" & ValutaKodRef & \"",
+          "          ]",
+          "        }",
+          "      },",
+          "      {",
+          "        \"\"code\"\": \"\"Tid\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"item\"\",",
+          "          \"\"values\"\": [",
+          "            \" & MonthListSCBDyn & \"",
+          "          ]",
+          "        }",
+          "      }",
+          "    ],",
+          "    \"\"response\"\": {",
+          "      \"\"format\"\": \"\"json\"\"",
+          "    }",
+          "  }\",",
+          "",
+          "  ContentPreMonth=\"{",
+          "    \"\"query\"\": [",
+          "      {",
+          "        \"\"code\"\": \"\"Institut\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"item\"\",",
+          "          \"\"values\"\": [",
+          "            \" & InstitutsKodList & \"",
+          "          ]",
+          "        }",
+          "      },",
+          "      {",
+          "        \"\"code\"\": \"\"Kontopost\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"vs:KontopostMFIA\"\",",
+          "          \"\"values\"\": [",
+          "            \" & KontoPostKodRef & \"",
+          "          ]",
+          "        }",
+          "      },",
+          "      {",
+          "        \"\"code\"\": \"\"Valuta\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"item\"\",",
+          "          \"\"values\"\": [",
+          "            \" & ValutaKodRef & \"",
+          "          ]",
+          "        }",
+          "      },",
+          "      {",
+          "        \"\"code\"\": \"\"Tid\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"item\"\",",
+          "          \"\"values\"\": [",
+          "            \" & MonthListSCBDynPrevMonth & \"",
+          "          ]",
+          "        }",
+          "      }",
+          "    ],",
+          "    \"\"response\"\": {",
+          "      \"\"format\"\": \"\"json\"\"",
+          "    }",
+          "  }\",",
+          "",
+          "      Source = try Json.Document(Web.Contents(\"https://api.scb.se/OV0104/v1/doris/sv/ssd/START/FM/FM0401/FM0401X/MFIM1\", [Content=Text.ToBinary(Content)])) otherwise Json.Document(Web.Contents(\"https://api.scb.se/OV0104/v1/doris/sv/ssd/START/FM/FM0401/FM0401X/MFIM1\", [Content=Text.ToBinary(ContentPreMonth)])) ,",
+          "      #\"Converted to Table\" = Record.ToTable(Source),",
+          "      #\"Expanded Value\" = Table.ExpandListColumn(#\"Converted to Table\", \"Value\"),",
+          "      #\"Expanded Value1\" = Table.ExpandRecordColumn(#\"Expanded Value\", \"Value\", {\"code\", \"text\", \"type\", \"key\", \"values\", \"infofile\", \"updated\", \"label\", \"source\"}, {\"Value.code\", \"Value.text\", \"Value.type\", \"Value.key\", \"Value.values\", \"Value.infofile\", \"Value.updated\", \"Value.label\", \"Value.source\"}),",
+          "      #\"Expanded Value.key\" = Table.ExpandListColumn(#\"Expanded Value1\", \"Value.key\"),",
+          "      #\"Expanded Value.values\" = Table.ExpandListColumn(#\"Expanded Value.key\", \"Value.values\"),",
+          "      #\"Removed Other Columns\" = Table.SelectColumns(#\"Expanded Value.values\",{\"Value.key\", \"Value.values\"}),",
+          "      #\"Added Custom\" = Table.AddColumn(#\"Removed Other Columns\", \"Month\", each if Text.Middle([Value.key], 4, 1 ) = \"M\" then [Value.key] else null),",
+          "      #\"Added Custom1\" = Table.AddColumn(#\"Added Custom\", \"YYYYMMDD\", each Text.Start([Month],4) & Text.End([Month],2) & \"25\"),",
+          "    #\"Filled Down1\" = Table.FillUp(#\"Added Custom1\",{\"YYYYMMDD\"}),",
+          "    #\"Filtered Rows1\" = Table.SelectRows(#\"Filled Down1\", each ([Value.key] <> null) and ([Month] = null)),",
+          "    #\"Removed Columns1\" = Table.RemoveColumns(#\"Filtered Rows1\",{\"Month\"}),",
+          "    #\"Added Custom2\" = Table.AddColumn(#\"Removed Columns1\", \"ValutaKod\", each if Text.Start( [Value.key], 1 ) = \"v\" then [Value.key] else null),",
+          "    #\"Added Custom3\" = Table.AddColumn(#\"Added Custom2\", \"KontopostKod\", each if Text.Start( [Value.key], 1 ) = \"K\" then [Value.key] else null),",
+          "    #\"Added Custom4\" = Table.AddColumn(#\"Added Custom3\", \"InstitutsdetaljKod\", each if [ValutaKod] = null and [KontopostKod] = null then [Value.key] else null),",
+          "    #\"Filled Up\" = Table.FillUp(#\"Added Custom4\",{\"ValutaKod\"}),",
+          "    #\"Filled Down\" = Table.FillDown(#\"Filled Up\",{\"InstitutsdetaljKod\"}),",
+          "    #\"Filtered Rows\" = Table.SelectRows(#\"Filled Down\", each ([KontopostKod] <> null )),",
+          "    #\"Removed Columns2\" = Table.RemoveColumns(#\"Filtered Rows\",{\"Value.key\"}),",
+          "    #\"Renamed Columns1\" = Table.RenameColumns(#\"Removed Columns2\",{{\"Value.values\", \"Value\"}, {\"YYYYMMDD\", \"Datum\"}}),",
+          "    #\"Replaced Value\" = Table.ReplaceValue(#\"Renamed Columns1\",\"..\",\"0\",Replacer.ReplaceText,{\"Value\"}),",
+          "    #\"Changed Type2\" = Table.TransformColumnTypes(#\"Replaced Value\",{{\"Value\", type number}, {\"Datum\", type date}, {\"ValutaKod\", type text}, {\"KontopostKod\", type text}, {\"InstitutsdetaljKod\", type text}})",
+          "in",
+          "    #\"Changed Type2\""
+        ],
+        "kind": "m",
+        "lineageTag": "ca0ccf4b-593d-4c58-905e-3af859d58638",
+        "queryGroup": "Func"
+      },
+      {
+        "name": "KontoPostKodRef",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Text"
+          }
+        ],
+        "expression": [
+          "let",
+          "    Source = Kontopost,",
+          "    #\"Removed Other Columns\" = Table.SelectColumns(Source,{\"KontopostKod\"}),",
+          "    #\"Added Custom2\" = Table.AddColumn(#\"Removed Other Columns\", \"KontopostKodWithQ\", each \"\"\"\" & [KontopostKod] & \"\"\"\"),",
+          "    #\"Added Custom\" = Table.AddColumn(#\"Added Custom2\", \"Custom\", each 1),",
+          "    #\"Grouped Rows\" = Table.Group(#\"Added Custom\", {\"Custom\"}, {{\"ToGroup\", each _, type table [KontopostKod=nullable text, Custom=number]}}),",
+          "    #\"Added Custom1\" = Table.AddColumn(#\"Grouped Rows\", \"NewColumn\", each [ToGroup][KontopostKodWithQ] ),",
+          "    #\"Removed Other Columns1\" = Table.SelectColumns(#\"Added Custom1\",{\"NewColumn\"}),",
+          "    #\"Extracted Values\" = Table.TransformColumns(#\"Removed Other Columns1\", {\"NewColumn\", each Text.Combine(List.Transform(_, Text.From), \",\" ), type text}),",
+          "    NewColumn = #\"Extracted Values\"{0}[NewColumn]",
+          "in",
+          "    NewColumn"
+        ],
+        "kind": "m",
+        "lineageTag": "7ec01b6d-3358-4334-99cc-b3c93e46982d"
+      },
+      {
+        "name": "ValutaKodRef",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Text"
+          }
+        ],
+        "expression": [
+          "let",
+          "    Source = Valuta,",
+          "    #\"Removed Other Columns\" = Table.SelectColumns(Source,{\"ValutaKod\"}),",
+          "    #\"Added Custom2\" = Table.AddColumn(#\"Removed Other Columns\", \"ValutaKodWithQ\", each \"\"\"\" & [ValutaKod] & \"\"\"\"),",
+          "    #\"Added Custom\" = Table.AddColumn(#\"Added Custom2\", \"Custom\", each 1),",
+          "    #\"Grouped Rows\" = Table.Group(#\"Added Custom\", {\"Custom\"}, {{\"ToGroup\", each _, type table [ValutaKod=nullable text, Custom=number]}}),",
+          "    #\"Added Custom1\" = Table.AddColumn(#\"Grouped Rows\", \"NewColumn\", each [ToGroup][ValutaKodWithQ]),",
+          "    #\"Removed Other Columns1\" = Table.SelectColumns(#\"Added Custom1\",{\"NewColumn\"}),",
+          "    #\"Extracted Values\" = Table.TransformColumns(#\"Removed Other Columns1\", {\"NewColumn\", each Text.Combine(List.Transform(_, Text.From), \",\" ), type text}),",
+          "    NewColumn = #\"Extracted Values\"{0}[NewColumn]",
+          "in",
+          "    NewColumn"
+        ],
+        "kind": "m",
+        "lineageTag": "25891c68-9896-473c-9f6a-5205901b9ec6"
+      },
+      {
+        "name": "MarknadsandelGrund (2)",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "expression": [
+          "let",
+          "",
+          "  Content=\"{",
+          "    \"\"query\"\": [",
+          "      {",
+          "        \"\"code\"\": \"\"Institut\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"item\"\",",
+          "          \"\"values\"\": [",
+          "            \" & InstitutsKodList & \"",
+          "          ]",
+          "        }",
+          "      },",
+          "      {",
+          "        \"\"code\"\": \"\"Kontopost\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"vs:KontopostMFIA\"\",",
+          "          \"\"values\"\": [",
+          "            \" & KontoPostKodRef & \"",
+          "          ]",
+          "        }",
+          "      },",
+          "      {",
+          "        \"\"code\"\": \"\"Valuta\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"item\"\",",
+          "          \"\"values\"\": [",
+          "            \" & ValutaKodRef & \"",
+          "          ]",
+          "        }",
+          "      },",
+          "      {",
+          "        \"\"code\"\": \"\"Tid\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"item\"\",",
+          "          \"\"values\"\": [",
+          "            \" & MonthListSCBDyn & \"",
+          "          ]",
+          "        }",
+          "      }",
+          "    ],",
+          "    \"\"response\"\": {",
+          "      \"\"format\"\": \"\"json\"\"",
+          "    }",
+          "  }\",",
+          "",
+          "  ContentPreMonth=\"{",
+          "    \"\"query\"\": [",
+          "      {",
+          "        \"\"code\"\": \"\"Institut\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"item\"\",",
+          "          \"\"values\"\": [",
+          "            \" & InstitutsKodList & \"",
+          "          ]",
+          "        }",
+          "      },",
+          "      {",
+          "        \"\"code\"\": \"\"Kontopost\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"vs:KontopostMFIA\"\",",
+          "          \"\"values\"\": [",
+          "            \" & KontoPostKodRef & \"",
+          "          ]",
+          "        }",
+          "      },",
+          "      {",
+          "        \"\"code\"\": \"\"Valuta\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"item\"\",",
+          "          \"\"values\"\": [",
+          "            \" & ValutaKodRef & \"",
+          "          ]",
+          "        }",
+          "      },",
+          "      {",
+          "        \"\"code\"\": \"\"Tid\"\",",
+          "        \"\"selection\"\": {",
+          "          \"\"filter\"\": \"\"item\"\",",
+          "          \"\"values\"\": [",
+          "            \" & MonthListSCBDynPrevMonth & \"",
+          "          ]",
+          "        }",
+          "      }",
+          "    ],",
+          "    \"\"response\"\": {",
+          "      \"\"format\"\": \"\"json\"\"",
+          "    }",
+          "  }\",",
+          "",
+          "      Source = try Json.Document(Web.Contents(\"https://api.scb.se/OV0104/v1/doris/sv/ssd/START/FM/FM0401/FM0401X/MFIM1\", [Content=Text.ToBinary(Content)])) otherwise Json.Document(Web.Contents(\"https://api.scb.se/OV0104/v1/doris/sv/ssd/START/FM/FM0401/FM0401X/MFIM1\", [Content=Text.ToBinary(ContentPreMonth)])) ,",
+          "      #\"Converted to Table\" = Record.ToTable(Source),",
+          "      #\"Expanded Value\" = Table.ExpandListColumn(#\"Converted to Table\", \"Value\"),",
+          "      #\"Expanded Value1\" = Table.ExpandRecordColumn(#\"Expanded Value\", \"Value\", {\"code\", \"text\", \"type\", \"key\", \"values\", \"infofile\", \"updated\", \"label\", \"source\"}, {\"Value.code\", \"Value.text\", \"Value.type\", \"Value.key\", \"Value.values\", \"Value.infofile\", \"Value.updated\", \"Value.label\", \"Value.source\"}),",
+          "      #\"Expanded Value.key\" = Table.ExpandListColumn(#\"Expanded Value1\", \"Value.key\"),",
+          "      #\"Expanded Value.values\" = Table.ExpandListColumn(#\"Expanded Value.key\", \"Value.values\"),",
+          "      #\"Removed Other Columns\" = Table.SelectColumns(#\"Expanded Value.values\",{\"Value.key\", \"Value.values\"}),",
+          "      #\"Added Custom\" = Table.AddColumn(#\"Removed Other Columns\", \"Month\", each if Text.Middle([Value.key], 4, 1 ) = \"M\" then [Value.key] else null),",
+          "      #\"Added Custom1\" = Table.AddColumn(#\"Added Custom\", \"YYYYMMDD\", each Text.Start([Month],4) & Text.End([Month],2) & \"25\"),",
+          "    #\"Filled Down1\" = Table.FillUp(#\"Added Custom1\",{\"YYYYMMDD\"}),",
+          "    #\"Filtered Rows1\" = Table.SelectRows(#\"Filled Down1\", each ([Value.key] <> null) and ([Month] = null)),",
+          "    #\"Removed Columns1\" = Table.RemoveColumns(#\"Filtered Rows1\",{\"Month\"}),",
+          "    #\"Added Custom2\" = Table.AddColumn(#\"Removed Columns1\", \"ValutaKod\", each if Text.Start( [Value.key], 1 ) = \"v\" then [Value.key] else null),",
+          "    #\"Added Custom3\" = Table.AddColumn(#\"Added Custom2\", \"KontopostKod\", each if Text.Start( [Value.key], 1 ) = \"K\" then [Value.key] else null),",
+          "    #\"Added Custom4\" = Table.AddColumn(#\"Added Custom3\", \"InstitutsdetaljKod\", each if [ValutaKod] = null and [KontopostKod] = null then [Value.key] else null),",
+          "    #\"Filled Up\" = Table.FillUp(#\"Added Custom4\",{\"ValutaKod\"}),",
+          "    #\"Filled Down\" = Table.FillDown(#\"Filled Up\",{\"InstitutsdetaljKod\"}),",
+          "    #\"Filtered Rows\" = Table.SelectRows(#\"Filled Down\", each ([KontopostKod] <> null )),",
+          "    #\"Removed Columns2\" = Table.RemoveColumns(#\"Filtered Rows\",{\"Value.key\"}),",
+          "    #\"Renamed Columns1\" = Table.RenameColumns(#\"Removed Columns2\",{{\"Value.values\", \"Value\"}, {\"YYYYMMDD\", \"Datum\"}}),",
+          "    #\"Replaced Value\" = Table.ReplaceValue(#\"Renamed Columns1\",\"..\",\"0\",Replacer.ReplaceText,{\"Value\"}),",
+          "    #\"Changed Type2\" = Table.TransformColumnTypes(#\"Replaced Value\",{{\"Value\", type number}, {\"Datum\", type date}, {\"ValutaKod\", type text}, {\"KontopostKod\", type text}, {\"InstitutsdetaljKod\", type text}}),",
+          "    #\"Added Custom5\" = Table.AddColumn(#\"Changed Type2\", \"Custom\", each  Table.Group(Table.SelectRows(#\"Changed Type2\", each ([InstitutsdetaljKod] <> \"S21\" and [InstitutsdetaljKod] <> \"s230\")), {\"Datum\", \"KontopostKod\", \"ValutaKod\"}, {{\"SumAllChoseInstitutPerDateAndKontopost\", each List.Sum([Value]), type nullable number}}) ),",
+          "    #\"Expanded Custom\" = Table.ExpandTableColumn(#\"Added Custom5\", \"Custom\", {\"Datum\", \"SumAllChoseInstitutPerDateAndKontopost\"}, {\"Custom.Datum\", \"Custom.SumAllChoseInstitutPerDateAndKontopost\"}),",
+          "    #\"Added Custom6\" = Table.AddColumn(#\"Expanded Custom\", \"FilterDatum\", each if [Datum] = [Custom.Datum] then 1 else 0),",
+          "    #\"Filtered Rows2\" = Table.SelectRows(#\"Added Custom6\", each ([FilterDatum] = 1)),",
+          "    #\"Added Custom7\" = Table.AddColumn(#\"Filtered Rows2\", \"Belopp\", each if [InstitutsdetaljKod] = \"S21\" then [Value] - [Custom.SumAllChoseInstitutPerDateAndKontopost] else [Value], type number),",
+          "    #\"Replaced Value1\" = Table.ReplaceValue(#\"Added Custom7\",\"S21\",\"OVGAKT\",Replacer.ReplaceText,{\"InstitutsdetaljKod\"}),",
+          "    #\"Removed Other Columns1\" = Table.SelectColumns(#\"Replaced Value1\",{\"Datum\", \"ValutaKod\", \"KontopostKod\", \"InstitutsdetaljKod\", \"Belopp\"}),",
+          "    #\"Renamed Columns\" = Table.RenameColumns(#\"Removed Other Columns1\",{{\"Belopp\", \"Value\"}})",
+          "in",
+          "    #\"Renamed Columns\""
+        ],
+        "kind": "m",
+        "lineageTag": "96399fd6-2968-4fe1-984e-c4a91251e699",
+        "queryGroup": "Func"
+      }
+    ],
+    "queryGroups": [
+      {
+        "annotations": [
+          {
+            "name": "PBI_QueryGroupOrder",
+            "value": "0"
+          }
+        ],
+        "folder": "Transform File from Query1"
+      },
+      {
+        "annotations": [
+          {
+            "name": "PBI_QueryGroupOrder",
+            "value": "0"
+          }
+        ],
+        "folder": "Transform File from Query1\\Helper Queries"
+      },
+      {
+        "annotations": [
+          {
+            "name": "PBI_QueryGroupOrder",
+            "value": "4"
+          }
+        ],
+        "folder": "Load"
+      },
+      {
+        "annotations": [
+          {
+            "name": "PBI_QueryGroupOrder",
+            "value": "3"
+          }
+        ],
+        "description": "Queries skapade med funkionen getAPI",
+        "folder": "Func"
+      }
+    ],
+    "relationships": [
+      {
+        "name": "1135b745-8741-487f-8565-184bc5b18ea0",
+        "fromColumn": "End of Month",
+        "fromTable": "Kalender",
+        "joinOnDateBehavior": "datePartOnly",
+        "toColumn": "Date",
+        "toTable": "LocalDateTable_93ed2b71-7e54-4c65-9021-ec8b33cf13cc"
+      },
+      {
+        "name": "b2b316db-025c-40c7-bf94-82ef461bc743",
+        "fromColumn": "Start of Month",
+        "fromTable": "Kalender",
+        "joinOnDateBehavior": "datePartOnly",
+        "toColumn": "Date",
+        "toTable": "LocalDateTable_eda73e9a-c1c1-417a-b9c2-daa7e0e3d6ba"
+      },
+      {
+        "name": "ef5d25d8-9c98-4436-a478-0e2e5f7039e8",
+        "fromColumn": "LastRefresh",
+        "fromTable": "LastRefresh",
+        "joinOnDateBehavior": "datePartOnly",
+        "toColumn": "Date",
+        "toTable": "LocalDateTable_a2c84e2e-936a-41d4-8c46-e9985f2f787f"
+      },
+      {
+        "name": "f81a57a4-c22a-461c-b409-295d658dfa77",
+        "fromColumn": "Datum",
+        "fromTable": "InterestRates",
+        "toColumn": "Date",
+        "toTable": "Kalender"
+      },
+      {
+        "name": "8c36c31f-44ef-42ad-bf1e-ad60b321be4c",
+        "fromColumn": "Date",
+        "fromTable": "Kalender",
+        "joinOnDateBehavior": "datePartOnly",
+        "toColumn": "Date",
+        "toTable": "LocalDateTable_fabad3b2-637b-4490-94b3-351a1abe508c"
+      },
+      {
+        "name": "b02b69e2-466b-4a0e-acee-8b8c0345cae8",
+        "fromColumn": "KontopostKod",
+        "fromTable": "Marknadsandel",
+        "toColumn": "KontopostKod",
+        "toTable": "Kontopost"
+      },
+      {
+        "name": "b6f9ca7c-4201-4989-929c-6e66e47d293b",
+        "fromColumn": "ValutaKod",
+        "fromTable": "Marknadsandel",
+        "toColumn": "ValutaKod",
+        "toTable": "Valuta"
+      },
+      {
+        "name": "ab8ad79d-dd2a-4a18-be1a-c0e23a193f6e",
+        "fromColumn": "Datum",
+        "fromTable": "Marknadsandel",
+        "toColumn": "Date",
+        "toTable": "Kalender"
+      },
+      {
+        "name": "69eb6029-82e8-4ac1-ad03-f78425ece978",
+        "fromColumn": "InstitutsdetaljKod",
+        "fromTable": "Marknadsandel",
+        "toColumn": "InstitutsDetaljKod",
+        "toTable": "Institut"
+      },
+      {
+        "name": "0607f3e9-e2e8-4dc0-ac8d-65a94923007f",
+        "fromColumn": "Datum",
+        "fromTable": "Marknadsandel Year Func",
+        "toColumn": "Date",
+        "toTable": "Kalender"
+      },
+      {
+        "name": "36d7f431-f280-4272-b16b-f2178414aeae",
+        "fromColumn": "InstitutsdetaljKod",
+        "fromTable": "Marknadsandel Year Func",
+        "toColumn": "InstitutsDetaljKod",
+        "toTable": "Institut"
+      },
+      {
+        "name": "00444f2f-1cf7-4928-9194-caabed46fdfe",
+        "fromColumn": "KontopostKod",
+        "fromTable": "Marknadsandel Year Func",
+        "toColumn": "KontopostKod",
+        "toTable": "Kontopost"
+      },
+      {
+        "name": "2e850b33-69b5-4eb4-8e13-65a830c445f3",
+        "fromColumn": "ValutaKod",
+        "fromTable": "Marknadsandel Year Func",
+        "toColumn": "ValutaKod",
+        "toTable": "Valuta"
+      },
+      {
+        "name": "bb83993a-e07a-43c3-b83d-ef4a5df3787f",
+        "fromColumn": "@Date",
+        "fromTable": "AndelNettotillvaxtDeltaRanta",
+        "joinOnDateBehavior": "datePartOnly",
+        "toColumn": "Date",
+        "toTable": "LocalDateTable_dea9690c-9ca6-4275-834e-248643c94ce1"
+      },
+      {
+        "name": "fe603ac7-87bb-48a1-9c97-6139904584d7",
+        "fromColumn": "InstitutsDetaljKod",
+        "fromTable": "AndelNettotillvaxtDeltaRanta",
+        "toColumn": "InstitutsDetaljKod",
+        "toTable": "Institut"
+      },
+      {
+        "name": "37f8c26d-b2ad-4e50-9c63-15d065b5b885",
+        "fromColumn": "KontopostKod",
+        "fromTable": "Marknadsandel Quarter Func",
+        "toColumn": "KontopostKod",
+        "toTable": "Kontopost"
+      },
+      {
+        "name": "bd873737-3d06-4a96-b8c9-0fe5ce786884",
+        "fromColumn": "ValutaKod",
+        "fromTable": "Marknadsandel Quarter Func",
+        "toColumn": "ValutaKod",
+        "toTable": "Valuta"
+      },
+      {
+        "name": "1445270a-ab65-456a-a59a-318c3c3cf793",
+        "fromColumn": "InstitutsdetaljKod",
+        "fromTable": "Marknadsandel Quarter Func",
+        "toColumn": "InstitutsDetaljKod",
+        "toTable": "Institut"
+      },
+      {
+        "name": "e50098cf-cbaf-44b9-b4c2-74bc819ffe25",
+        "fromColumn": "Datum",
+        "fromTable": "Marknadsandel Quarter Func",
+        "toColumn": "Date",
+        "toTable": "Kalender"
+      }
+    ],
+    "sourceQueryCulture": "sv-SE",
+    "tables": [
+      {
+        "name": "DateTableTemplate_90b7fe59-97e4-48a3-b2ba-be3482157def",
+        "annotations": [
+          {
+            "name": "__PBI_TemplateDateTable",
+            "value": "true"
+          },
+          {
+            "name": "DefaultItem",
+            "value": "DateHierarchy"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Date",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              }
+            ],
+            "dataCategory": "PaddedDateTableDates",
+            "dataType": "dateTime",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "c35eab7e-92b9-4230-acde-59ea757870da",
+            "sourceColumn": "[Date]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Year",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Year"
+              }
+            ],
+            "dataCategory": "Years",
+            "dataType": "int64",
+            "expression": "YEAR([Date])",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "lineageTag": "76cb709a-8cbf-4139-90a5-a67b92b387a7",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "MonthNo",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "MonthNumber"
+              }
+            ],
+            "dataCategory": "MonthOfYear",
+            "dataType": "int64",
+            "expression": "MONTH([Date])",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "lineageTag": "819623c1-1ad2-4708-a561-7cc64776492f",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Month",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Month"
+              }
+            ],
+            "dataCategory": "Months",
+            "dataType": "string",
+            "expression": "FORMAT([Date], \"MMMM\")",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "lineageTag": "634189cb-9bae-43d1-8196-9392a843d356",
+            "sortByColumn": "MonthNo",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "QuarterNo",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "QuarterNumber"
+              }
+            ],
+            "dataCategory": "QuarterOfYear",
+            "dataType": "int64",
+            "expression": "INT(([MonthNo] + 2) / 3)",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "lineageTag": "5acd2706-4f78-4d55-93ee-39d5635288da",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Quarter",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Quarter"
+              }
+            ],
+            "dataCategory": "Quarters",
+            "dataType": "string",
+            "expression": "\"Qtr \" & [QuarterNo]",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "lineageTag": "f262fc4f-37d2-4e6e-9dd4-912183bc2717",
+            "sortByColumn": "QuarterNo",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Day",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Day"
+              }
+            ],
+            "dataCategory": "DayOfMonth",
+            "dataType": "int64",
+            "expression": "DAY([Date])",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "lineageTag": "bcbed428-29e4-4614-bafb-9848e3b8309e",
+            "summarizeBy": "none",
+            "type": "calculated"
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Date Hierarchy",
+            "annotations": [
+              {
+                "name": "TemplateId",
+                "value": "DateHierarchy"
+              }
+            ],
+            "levels": [
+              {
+                "name": "Year",
+                "column": "Year",
+                "lineageTag": "f1c6b9ba-a029-49c9-a3ee-4f63a22dd314",
+                "ordinal": 0
+              },
+              {
+                "name": "Quarter",
+                "column": "Quarter",
+                "lineageTag": "373c50e8-c2d1-4626-94bc-5f5b34570abd",
+                "ordinal": 1
+              },
+              {
+                "name": "Month",
+                "column": "Month",
+                "lineageTag": "a76baaf8-daac-4bfe-94a3-9a85dd541bdc",
+                "ordinal": 2
+              },
+              {
+                "name": "Day",
+                "column": "Day",
+                "lineageTag": "eb8b1fb3-181d-4d86-8101-46c650487483",
+                "ordinal": 3
+              }
+            ],
+            "lineageTag": "30ffea7f-14e8-4baa-b77b-70832a4542ef"
+          }
+        ],
+        "isHidden": true,
+        "isPrivate": true,
+        "lineageTag": "831d7767-cf42-4f2d-b1ab-5e0be1cee0b9",
+        "partitions": [
+          {
+            "name": "DateTableTemplate_90b7fe59-97e4-48a3-b2ba-be3482157def-4010bf0e-8a02-4f9e-ac9e-6d62435607fa",
+            "mode": "import",
+            "source": {
+              "expression": "Calendar(Date(2015,1,1), Date(2015,1,1))",
+              "type": "calculated"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Kalender",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Date",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "UnderlyingDateTimeDataType",
+                "value": "Date"
+              }
+            ],
+            "dataType": "dateTime",
+            "formatString": "Long Date",
+            "lineageTag": "f7150859-f72d-4f65-ad2f-e437a6bc5e5c",
+            "sourceColumn": "Date",
+            "summarizeBy": "none",
+            "variations": [
+              {
+                "name": "Variation",
+                "defaultHierarchy": {
+                  "hierarchy": "Date Hierarchy",
+                  "table": "LocalDateTable_fabad3b2-637b-4490-94b3-351a1abe508c"
+                },
+                "isDefault": true,
+                "relationship": "8c36c31f-44ef-42ad-bf1e-ad60b321be4c"
+              }
+            ]
+          },
+          {
+            "name": "Year",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "3f3e549f-7ccb-43b9-8e29-8131111e5cf2",
+            "sourceColumn": "Year",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "Month",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "isHidden": true,
+            "lineageTag": "26ed411f-182d-48e5-b859-8bd080f253a1",
+            "sourceColumn": "Month",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "Month Name",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "SortByColumn"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "a5ce3989-3a68-4506-8e3d-b9a07f5688bf",
+            "sortByColumn": "Month",
+            "sourceColumn": "Month Name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Quarter",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "isHidden": true,
+            "lineageTag": "99ba88c4-b886-47d4-9752-1eec740d53a0",
+            "sourceColumn": "Quarter",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "Week of Year",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "isHidden": true,
+            "lineageTag": "d85e316e-0007-4c82-8397-3e67ecaa80d1",
+            "sourceColumn": "Week of Year",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "Day Name",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "SortByColumn"
+              },
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "string",
+            "isHidden": true,
+            "lineageTag": "d80b8bfa-7327-47cd-ae9d-4f9c6385992e",
+            "sortByColumn": "Day of Week",
+            "sourceColumn": "Day Name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Quarter Order",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "isHidden": true,
+            "lineageTag": "0c5b3fda-85f9-4d1b-ab49-086734ec54cd",
+            "sourceColumn": "Quarter Order",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "Month-Year Order",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "isHidden": true,
+            "lineageTag": "28d294d6-8e0e-413d-89e0-2b4e47a4c77b",
+            "sourceColumn": "Month-Year Order",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "Month-Year",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "SortByColumn"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "759dc4dc-46fd-48ad-8c36-3aacdc5ee55c",
+            "sortByColumn": "Month-Year Order",
+            "sourceColumn": "Month-Year",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Month-Short",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "SortByColumn"
+              },
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "string",
+            "isHidden": true,
+            "lineageTag": "d317be6e-3f7a-49e3-a41f-b7c5579ce819",
+            "sortByColumn": "Month",
+            "sourceColumn": "Month-Short",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Day of Week",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "isHidden": true,
+            "lineageTag": "941b8b50-908a-4c16-bd99-cf56e766f496",
+            "sourceColumn": "Day of Week",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "Week Name",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "string",
+            "isHidden": true,
+            "lineageTag": "76b8adfe-c7d0-40fe-a2ef-2e1057946477",
+            "sourceColumn": "Week Name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "End of Month",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "UnderlyingDateTimeDataType",
+                "value": "Date"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "dateTime",
+            "formatString": "Short Date",
+            "isHidden": true,
+            "lineageTag": "77b46d43-0983-4e2f-8169-fe1ca24f06f9",
+            "sourceColumn": "End of Month",
+            "summarizeBy": "none",
+            "variations": [
+              {
+                "name": "Variation",
+                "defaultHierarchy": {
+                  "hierarchy": "Date Hierarchy",
+                  "table": "LocalDateTable_93ed2b71-7e54-4c65-9021-ec8b33cf13cc"
+                },
+                "isDefault": true,
+                "relationship": "1135b745-8741-487f-8565-184bc5b18ea0"
+              }
+            ]
+          },
+          {
+            "name": "Day",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "isHidden": true,
+            "lineageTag": "da3596fd-7d0d-4034-ba7e-2bb11fd742ed",
+            "sourceColumn": "Day",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "Start of Month",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "UnderlyingDateTimeDataType",
+                "value": "Date"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "dateTime",
+            "formatString": "Long Date",
+            "isHidden": true,
+            "lineageTag": "74387a1f-4ea3-4213-968f-c218490c8368",
+            "sourceColumn": "Start of Month",
+            "summarizeBy": "none",
+            "variations": [
+              {
+                "name": "Variation",
+                "defaultHierarchy": {
+                  "hierarchy": "Date Hierarchy",
+                  "table": "LocalDateTable_eda73e9a-c1c1-417a-b9c2-daa7e0e3d6ba"
+                },
+                "isDefault": true,
+                "relationship": "b2b316db-025c-40c7-bf94-82ef461bc743"
+              }
+            ]
+          },
+          {
+            "name": "Year-Quarter",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "10d5827d-9510-48ca-acf6-8345998f0934",
+            "sourceColumn": "Year-Quarter",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "903335df-b06c-4d64-918a-092e8fcfeb7c",
+        "partitions": [
+          {
+            "name": "Kalender",
+            "mode": "import",
+            "queryGroup": "Func",
+            "source": {
+              "expression": [
+                "let",
+                "    Source = { Number.From( #date( 2012,1,1) ) .. Number.From( #date( Date.Year(Date.From(DateTime.LocalNow())), 12 , 31 ) ) },",
+                "    #\"Converted to Table\" = Table.FromList(Source, Splitter.SplitByNothing(), null, null, ExtraValues.Error),",
+                "    #\"Changed Type\" = Table.TransformColumnTypes(#\"Converted to Table\",{{\"Column1\", type date}}),",
+                "    #\"Renamed Columns\" = Table.RenameColumns(#\"Changed Type\",{{\"Column1\", \"Date\"}}),",
+                "    #\"Inserted Year\" = Table.AddColumn(#\"Renamed Columns\", \"Year\", each Date.Year([Date]), Int64.Type),",
+                "    #\"Inserted Month\" = Table.AddColumn(#\"Inserted Year\", \"Month\", each Date.Month([Date]), Int64.Type),",
+                "    #\"Inserted Month Name\" = Table.AddColumn(#\"Inserted Month\", \"Month Name\", each Date.MonthName([Date]), type text),",
+                "    #\"Inserted Quarter\" = Table.AddColumn(#\"Inserted Month Name\", \"Quarter\", each Date.QuarterOfYear([Date]), Int64.Type),",
+                "    #\"Inserted Week of Year\" = Table.AddColumn(#\"Inserted Quarter\", \"Week of Year\", each Date.WeekOfYear([Date]), Int64.Type),",
+                "    #\"Inserted Day Name\" = Table.AddColumn(#\"Inserted Week of Year\", \"Day Name\", each Date.DayOfWeekName([Date]), type text),",
+                "    #\"Added Custom\" = Table.AddColumn(#\"Inserted Day Name\", \"Quarter Order\", each [Year] * 10 + [Quarter], Int64.Type ),",
+                "    #\"Added Custom1\" = Table.AddColumn(#\"Added Custom\", \"Year-Quarter\", each Number.ToText( [Year] ) & \"Q\" & Number.ToText( [Quarter] ), type text),",
+                "    #\"Added Custom2\" = Table.AddColumn(#\"Added Custom1\", \"Month-Year Order\", each [Year] * 100 + [Month], Int64.Type),",
+                "    #\"Added Custom3\" = Table.AddColumn(#\"Added Custom2\", \"Month-Year\", each Date.ToText( [Date], \"MMM\" ) & \"-\" & Number.ToText( [Year] ), type text),",
+                "    #\"Added Custom4\" = Table.AddColumn(#\"Added Custom3\", \"Month-Short\", each Date.ToText( [Date], \"MMM\" ), type text),",
+                "    #\"Inserted Day of Week\" = Table.AddColumn(#\"Added Custom4\", \"Day of Week\", each Date.DayOfWeek([Date]), Int64.Type),",
+                "    #\"Added Custom5\" = Table.AddColumn(#\"Inserted Day of Week\", \"Week Name\", each \"v-\" & Number.ToText( [Week of Year] ), type text),",
+                "    #\"Inserted End of Month\" = Table.AddColumn(#\"Added Custom5\", \"End of Month\", each Date.EndOfMonth([Date]), type date),",
+                "    #\"Inserted Day\" = Table.AddColumn(#\"Inserted End of Month\", \"Day\", each Date.Day([Date]), Int64.Type),",
+                "    #\"Inserted Start of Month\" = Table.AddColumn(#\"Inserted Day\", \"Start of Month\", each Date.StartOfMonth([Date]), type date)",
+                "in",
+                "    #\"Inserted Start of Month\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "LocalDateTable_93ed2b71-7e54-4c65-9021-ec8b33cf13cc",
+        "annotations": [
+          {
+            "name": "__PBI_LocalDateTable",
+            "value": "true"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Date",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              }
+            ],
+            "dataCategory": "PaddedDateTableDates",
+            "dataType": "dateTime",
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "3993e9fe-cab5-4659-a386-263cd21fcb7d",
+            "sourceColumn": "[Date]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Year",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Year"
+              }
+            ],
+            "dataCategory": "Years",
+            "dataType": "int64",
+            "expression": "YEAR([Date])",
+            "isHidden": true,
+            "lineageTag": "c26a0b7e-6b2a-477c-b030-93138581c80f",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "MonthNo",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "MonthNumber"
+              }
+            ],
+            "dataCategory": "MonthOfYear",
+            "dataType": "int64",
+            "expression": "MONTH([Date])",
+            "isHidden": true,
+            "lineageTag": "79356469-efc6-4aa1-bb11-1be216596758",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Month",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Month"
+              }
+            ],
+            "dataCategory": "Months",
+            "dataType": "string",
+            "expression": "FORMAT([Date], \"MMMM\")",
+            "isHidden": true,
+            "lineageTag": "3f39dbf8-3717-4a87-89cb-a8ac2f7e08e9",
+            "sortByColumn": "MonthNo",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "QuarterNo",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "QuarterNumber"
+              }
+            ],
+            "dataCategory": "QuarterOfYear",
+            "dataType": "int64",
+            "expression": "INT(([MonthNo] + 2) / 3)",
+            "isHidden": true,
+            "lineageTag": "d15a15ba-e1f5-4e4c-8df1-60e53b5de54b",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Quarter",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Quarter"
+              }
+            ],
+            "dataCategory": "Quarters",
+            "dataType": "string",
+            "expression": "\"Qtr \" & [QuarterNo]",
+            "isHidden": true,
+            "lineageTag": "5879bb1b-40bc-4423-994d-b580a8205499",
+            "sortByColumn": "QuarterNo",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Day",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Day"
+              }
+            ],
+            "dataCategory": "DayOfMonth",
+            "dataType": "int64",
+            "expression": "DAY([Date])",
+            "isHidden": true,
+            "lineageTag": "2ce933de-4256-4df0-8079-f33570175a50",
+            "summarizeBy": "none",
+            "type": "calculated"
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Date Hierarchy",
+            "annotations": [
+              {
+                "name": "TemplateId",
+                "value": "DateHierarchy"
+              }
+            ],
+            "levels": [
+              {
+                "name": "Year",
+                "column": "Year",
+                "lineageTag": "09294502-9345-41af-8127-076a2b1ab5d9",
+                "ordinal": 0
+              },
+              {
+                "name": "Quarter",
+                "column": "Quarter",
+                "lineageTag": "40260d41-d696-4d88-aa43-434ea90d1c61",
+                "ordinal": 1
+              },
+              {
+                "name": "Month",
+                "column": "Month",
+                "lineageTag": "f26bc85d-3d0f-4901-b02d-65c5a6b28b17",
+                "ordinal": 2
+              },
+              {
+                "name": "Day",
+                "column": "Day",
+                "lineageTag": "53c37410-f69f-43a8-82f2-f32a6ef477ec",
+                "ordinal": 3
+              }
+            ],
+            "lineageTag": "2934ba3c-1354-4731-9c10-a6a5a368a584"
+          }
+        ],
+        "isHidden": true,
+        "lineageTag": "fdb5d247-efcd-49db-9266-ecd80b0f92ce",
+        "partitions": [
+          {
+            "name": "LocalDateTable_93ed2b71-7e54-4c65-9021-ec8b33cf13cc",
+            "mode": "import",
+            "source": {
+              "expression": "Calendar(Date(Year(MIN('Kalender'[End of Month])), 1, 1), Date(Year(MAX('Kalender'[End of Month])), 12, 31))",
+              "type": "calculated"
+            }
+          }
+        ],
+        "showAsVariationsOnly": true
+      },
+      {
+        "name": "LocalDateTable_eda73e9a-c1c1-417a-b9c2-daa7e0e3d6ba",
+        "annotations": [
+          {
+            "name": "__PBI_LocalDateTable",
+            "value": "true"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Date",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              }
+            ],
+            "dataCategory": "PaddedDateTableDates",
+            "dataType": "dateTime",
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "b6bccb7f-0238-4028-a5a1-8cf0b195d536",
+            "sourceColumn": "[Date]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Year",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Year"
+              }
+            ],
+            "dataCategory": "Years",
+            "dataType": "int64",
+            "expression": "YEAR([Date])",
+            "isHidden": true,
+            "lineageTag": "aeefacf4-4960-4ca1-b3fe-9f685a456f70",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "MonthNo",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "MonthNumber"
+              }
+            ],
+            "dataCategory": "MonthOfYear",
+            "dataType": "int64",
+            "expression": "MONTH([Date])",
+            "isHidden": true,
+            "lineageTag": "d8ec18cf-2ddb-4633-8224-d0b81507f14a",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Month",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Month"
+              }
+            ],
+            "dataCategory": "Months",
+            "dataType": "string",
+            "expression": "FORMAT([Date], \"MMMM\")",
+            "isHidden": true,
+            "lineageTag": "d86d7272-9510-423a-bf05-b59693a42d59",
+            "sortByColumn": "MonthNo",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "QuarterNo",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "QuarterNumber"
+              }
+            ],
+            "dataCategory": "QuarterOfYear",
+            "dataType": "int64",
+            "expression": "INT(([MonthNo] + 2) / 3)",
+            "isHidden": true,
+            "lineageTag": "68a7f2a2-951a-41f0-b3fb-ef11c5c6c77a",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Quarter",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Quarter"
+              }
+            ],
+            "dataCategory": "Quarters",
+            "dataType": "string",
+            "expression": "\"Qtr \" & [QuarterNo]",
+            "isHidden": true,
+            "lineageTag": "9ccc2c2d-6545-40ea-b4ea-75de02647c9d",
+            "sortByColumn": "QuarterNo",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Day",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Day"
+              }
+            ],
+            "dataCategory": "DayOfMonth",
+            "dataType": "int64",
+            "expression": "DAY([Date])",
+            "isHidden": true,
+            "lineageTag": "f3e3f0e6-9829-4961-a1e3-164c96cfa172",
+            "summarizeBy": "none",
+            "type": "calculated"
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Date Hierarchy",
+            "annotations": [
+              {
+                "name": "TemplateId",
+                "value": "DateHierarchy"
+              }
+            ],
+            "levels": [
+              {
+                "name": "Year",
+                "column": "Year",
+                "lineageTag": "2ae9047b-7a9c-4d36-b3a2-b8d362dea96b",
+                "ordinal": 0
+              },
+              {
+                "name": "Quarter",
+                "column": "Quarter",
+                "lineageTag": "22c021f6-f6ae-489f-b3ef-25592aa840d6",
+                "ordinal": 1
+              },
+              {
+                "name": "Month",
+                "column": "Month",
+                "lineageTag": "1b099a5d-16ad-4b41-82dd-3d326ffac8e6",
+                "ordinal": 2
+              },
+              {
+                "name": "Day",
+                "column": "Day",
+                "lineageTag": "227f4e0d-a7a3-44a2-8363-a450b1ca74c5",
+                "ordinal": 3
+              }
+            ],
+            "lineageTag": "39407286-ef0a-453e-9508-cc93505cfd21"
+          }
+        ],
+        "isHidden": true,
+        "lineageTag": "f18279af-e1c5-4075-a8a8-ed5cd0a1719b",
+        "partitions": [
+          {
+            "name": "LocalDateTable_eda73e9a-c1c1-417a-b9c2-daa7e0e3d6ba",
+            "mode": "import",
+            "source": {
+              "expression": "Calendar(Date(Year(MIN('Kalender'[Start of Month])), 1, 1), Date(Year(MAX('Kalender'[Start of Month])), 12, 31))",
+              "type": "calculated"
+            }
+          }
+        ],
+        "showAsVariationsOnly": true
+      },
+      {
+        "name": "InterestRates",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          },
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          }
+        ],
+        "changedProperties": [
+          {
+            "property": "IsHidden"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Datum",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "UnderlyingDateTimeDataType",
+                "value": "Date"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "dateTime",
+            "formatString": "Long Date",
+            "isHidden": true,
+            "lineageTag": "da57ef0e-c9bc-4573-b987-f963df019413",
+            "sourceColumn": "Datum",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "InterestRateX1000000",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "isHidden": true,
+            "lineageTag": "a965d44b-3295-4b8c-84bc-2af2696a01f8",
+            "sourceColumn": "InterestRateX1000000",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "InstitutsdetaljKod",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "string",
+            "isHidden": true,
+            "lineageTag": "45ce010e-6775-4077-8e3a-3c9d947930ec",
+            "sourceColumn": "InstitutsdetaljKod",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "DeltaSnittRanta",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "double",
+            "isHidden": true,
+            "lineageTag": "0f9d41cd-2ff3-4eaf-a7f8-4724c1c020ae",
+            "sourceColumn": "DeltaSnittRanta",
+            "summarizeBy": "sum"
+          }
+        ],
+        "isHidden": true,
+        "lineageTag": "b3c57f22-248c-423b-bba9-f96727ee460d",
+        "partitions": [
+          {
+            "name": "InterestRates",
+            "mode": "import",
+            "queryGroup": "Func",
+            "source": {
+              "expression": [
+                "let",
+                "    Source = SharePointConection,",
+                "    #\"Filtered Rows\" = Table.SelectRows(Source, each ([Name] = \"FactAvgInterestRate3Months\")),",
+                "    #\"Removed Other Columns\" = Table.SelectColumns(#\"Filtered Rows\",{\"Data\"}),",
+                "    #\"Expanded Data\" = Table.ExpandTableColumn(#\"Removed Other Columns\", \"Data\", {\"Column1\", \"Column2\", \"Column3\"}, {\"Data.Column1\", \"Data.Column2\", \"Data.Column3\"}),",
+                "    #\"Promoted Headers\" = Table.PromoteHeaders(#\"Expanded Data\", [PromoteAllScalars=true]),",
+                "    #\"Changed Type\" = Table.TransformColumnTypes(#\"Promoted Headers\",{{\"Bank\", type text}, {\"Datum\", type date}, {\"InterestRateX1000000\", Int64.Type}}),",
+                "    #\"Merged Queries\" = Table.NestedJoin(#\"Changed Type\", {\"Bank\"}, DimBanksNew, {\"Bank\"}, \"DimBanksNew\", JoinKind.LeftOuter),",
+                "    #\"Expanded DimBanksNew\" = Table.ExpandTableColumn(#\"Merged Queries\", \"DimBanksNew\", {\"InstitutsdetaljKod\"}, {\"InstitutsdetaljKod\"}),",
+                "    #\"Removed Columns\" = Table.RemoveColumns(#\"Expanded DimBanksNew\",{\"Bank\"}),",
+                "    #\"Merged Queries1\" = Table.NestedJoin(#\"Removed Columns\", {\"Datum\"}, InterestRatesSnitt, {\"Datum\"}, \"InterestRatesSnitt\", JoinKind.LeftOuter),",
+                "    #\"Expanded InterestRatesSnitt\" = Table.ExpandTableColumn(#\"Merged Queries1\", \"InterestRatesSnitt\", {\"SnittRanta\"}, {\"InterestRatesSnitt.SnittRanta\"}),",
+                "    #\"Added Custom\" = Table.AddColumn(#\"Expanded InterestRatesSnitt\", \"DeltaSnittRanta\", each [InterestRateX1000000] - [InterestRatesSnitt.SnittRanta], type number),",
+                "    #\"Removed Columns1\" = Table.RemoveColumns(#\"Added Custom\",{\"InterestRatesSnitt.SnittRanta\"})",
+                "in",
+                "    #\"Removed Columns1\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Context Time Intelligence",
+        "calculationGroup": {
+          "calculationItems": [
+            {
+              "name": "MTD",
+              "expression": [
+                "",
+                "var _MaxDateFact = MAX( 'Marknadsandel'[Datum] )",
+                "var _Result = CALCULATE( SELECTEDMEASURE(), Kalender[Date] = _MaxDateFact )",
+                "return _Result"
+              ]
+            },
+            {
+              "name": "QTD",
+              "expression": [
+                "",
+                "var _MaxDateFact = MAX( 'Marknadsandel'[Datum] )",
+                "var _MaxQuarterOrder = CALCULATE( MAX( Kalender[Quarter Order] ), Kalender[Date] = _MaxDateFact )",
+                "var _Result = CALCULATE( SELECTEDMEASURE(), Kalender[Quarter Order] = _MaxQuarterOrder )",
+                "return _Result"
+              ]
+            },
+            {
+              "name": "YTD",
+              "expression": [
+                "",
+                "var _MaxYear = YEAR( MAX( 'Marknadsandel'[Datum] ) )",
+                "var _Result =",
+                "    CALCULATE( SELECTEDMEASURE(), Kalender[Year] = _MaxYear )",
+                "return _Result"
+              ]
+            }
+          ]
+        },
+        "columns": [
+          {
+            "name": "Current Date",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "isHidden": true,
+            "lineageTag": "46b5f039-f0f2-493b-924d-3d9b4f49b12f",
+            "sortByColumn": "Ordinal",
+            "sourceColumn": "Name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Ordinal",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "isHidden": true,
+            "lineageTag": "fee7c41c-8fb6-46e7-96dd-170612147179",
+            "sourceColumn": "Ordinal",
+            "summarizeBy": "sum"
+          }
+        ],
+        "isHidden": true,
+        "lineageTag": "6b17c9af-9dd4-4a51-b263-c5cc37fd1a28",
+        "partitions": [
+          {
+            "name": "Context Time Intelligence",
+            "mode": "import",
+            "source": {
+              "type": "calculationGroup"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Context Skandia",
+        "calculationGroup": {
+          "calculationItems": [
+            {
+              "name": "Current Institiut",
+              "expression": [
+                "",
+                "var _SelectedInstitut = SELECTEDVALUE( Institut[Institutsnamn], \"Skandiabanken\" ) ",
+                "var _Result = CALCULATE( SELECTEDMEASURE(), Institut[Institutsnamn] = _SelectedInstitut )",
+                "return _Result"
+              ]
+            },
+            {
+              "name": "Institut disconnected",
+              "expression": [
+                "",
+                " var _SlicerChild =",
+                "    CALCULATE(",
+                "        SELECTEDMEASURE()",
+                "        , TREATAS( VALUES( 'Institut Disconnected'[Institutsnamn] ), Institut[Institutsnamn] )",
+                "    )",
+                "var _SlicerParent = SELECTEDMEASURE()",
+                "var _Result =",
+                "    IF( SELECTEDVALUE( 'Institut Disconnected'[InstitutsOrder] ) IN VALUES( Institut[InstitutsOrder] ), _SlicerChild, _SlicerParent )",
+                "return _Result"
+              ]
+            }
+          ],
+          "precedence": 1
+        },
+        "columns": [
+          {
+            "name": "Current Institut",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "isHidden": true,
+            "lineageTag": "30123101-bb2c-4eb7-800d-606ed138cbcf",
+            "sortByColumn": "Ordinal",
+            "sourceColumn": "Name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Ordinal",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "isHidden": true,
+            "lineageTag": "83617483-8d3b-449b-acb1-bd08bc3b65a9",
+            "sourceColumn": "Ordinal",
+            "summarizeBy": "sum"
+          }
+        ],
+        "isHidden": true,
+        "lineageTag": "ad0885f6-efc4-4b45-94b8-203f1044e357",
+        "partitions": [
+          {
+            "name": "Context Skandia",
+            "mode": "import",
+            "source": {
+              "type": "calculationGroup"
+            }
+          }
+        ]
+      },
+      {
+        "name": "LastRefresh",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "changedProperties": [
+          {
+            "property": "IsHidden"
+          }
+        ],
+        "columns": [
+          {
+            "name": "LastRefresh",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "dateTime",
+            "formatString": "General Date",
+            "isHidden": true,
+            "lineageTag": "4cf48619-613d-433f-904e-34dedb71df9d",
+            "sourceColumn": "LastRefresh",
+            "summarizeBy": "none",
+            "variations": [
+              {
+                "name": "Variation",
+                "defaultHierarchy": {
+                  "hierarchy": "Date Hierarchy",
+                  "table": "LocalDateTable_a2c84e2e-936a-41d4-8c46-e9985f2f787f"
+                },
+                "isDefault": true,
+                "relationship": "ef5d25d8-9c98-4436-a478-0e2e5f7039e8"
+              }
+            ]
+          }
+        ],
+        "isHidden": true,
+        "lineageTag": "146f230e-4042-442b-a3ee-333fa056c5ad",
+        "measures": [
+          {
+            "name": "LastRefreshed",
+            "expression": "\"Senast uppdaterad: \" &FORMAT( MAX( LastRefresh[LastRefresh] ), \"YYYY-MM-DD hh:mm:ss\" )",
+            "lineageTag": "6117c39d-c642-4e4a-941c-d6736ac877a8"
+          },
+          {
+            "name": "Senast uppdaterad:",
+            "expression": "FORMAT( NOW(), \"YYYY-MM-DD hh:mm:ss\" )",
+            "lineageTag": "4b50d4cb-da4c-4f19-9f86-84a7c3929e90"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "LastRefresh",
+            "mode": "import",
+            "queryGroup": "Func",
+            "source": {
+              "expression": [
+                "let",
+                "    Source = #table(type table[LastRefresh=datetime], {{DateTime.LocalNow()}})",
+                "in",
+                "    Source"
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "LocalDateTable_a2c84e2e-936a-41d4-8c46-e9985f2f787f",
+        "annotations": [
+          {
+            "name": "__PBI_LocalDateTable",
+            "value": "true"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Date",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              }
+            ],
+            "dataCategory": "PaddedDateTableDates",
+            "dataType": "dateTime",
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "5d2931a1-c915-4df9-a724-fa95956d5b84",
+            "sourceColumn": "[Date]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Year",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Year"
+              }
+            ],
+            "dataCategory": "Years",
+            "dataType": "int64",
+            "expression": "YEAR([Date])",
+            "isHidden": true,
+            "lineageTag": "044dee4a-d5ec-4eea-9ae4-9e2fde527018",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "MonthNo",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "MonthNumber"
+              }
+            ],
+            "dataCategory": "MonthOfYear",
+            "dataType": "int64",
+            "expression": "MONTH([Date])",
+            "isHidden": true,
+            "lineageTag": "45d61efc-b6e4-42eb-b437-c930748def4d",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Month",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Month"
+              }
+            ],
+            "dataCategory": "Months",
+            "dataType": "string",
+            "expression": "FORMAT([Date], \"MMMM\")",
+            "isHidden": true,
+            "lineageTag": "cc1bb7f8-e504-42cb-a4e2-37c3024781ba",
+            "sortByColumn": "MonthNo",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "QuarterNo",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "QuarterNumber"
+              }
+            ],
+            "dataCategory": "QuarterOfYear",
+            "dataType": "int64",
+            "expression": "INT(([MonthNo] + 2) / 3)",
+            "isHidden": true,
+            "lineageTag": "2e8548d1-19fa-4fe9-a150-843be4b3ff78",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Quarter",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Quarter"
+              }
+            ],
+            "dataCategory": "Quarters",
+            "dataType": "string",
+            "expression": "\"Qtr \" & [QuarterNo]",
+            "isHidden": true,
+            "lineageTag": "9efc7866-9500-47eb-80e9-0932f9bea5c5",
+            "sortByColumn": "QuarterNo",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Day",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Day"
+              }
+            ],
+            "dataCategory": "DayOfMonth",
+            "dataType": "int64",
+            "expression": "DAY([Date])",
+            "isHidden": true,
+            "lineageTag": "42edb224-8fa8-4fa0-b92d-5335bcaf23ba",
+            "summarizeBy": "none",
+            "type": "calculated"
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Date Hierarchy",
+            "annotations": [
+              {
+                "name": "TemplateId",
+                "value": "DateHierarchy"
+              }
+            ],
+            "levels": [
+              {
+                "name": "Year",
+                "column": "Year",
+                "lineageTag": "315800fb-725e-485d-bffe-49dbdb61fd46",
+                "ordinal": 0
+              },
+              {
+                "name": "Quarter",
+                "column": "Quarter",
+                "lineageTag": "e9f589d7-d0e2-48b7-89ba-75466b9a7c1c",
+                "ordinal": 1
+              },
+              {
+                "name": "Month",
+                "column": "Month",
+                "lineageTag": "5dd7e24d-58bf-49ad-9676-4dacf934da13",
+                "ordinal": 2
+              },
+              {
+                "name": "Day",
+                "column": "Day",
+                "lineageTag": "f8011334-fa6f-4116-afea-d3e35e599ae9",
+                "ordinal": 3
+              }
+            ],
+            "lineageTag": "efa58885-d4da-4ba7-8a36-0e0d1e4fe37c"
+          }
+        ],
+        "isHidden": true,
+        "lineageTag": "8c9b27f5-da03-4d83-9fa4-00262dc945d3",
+        "partitions": [
+          {
+            "name": "LocalDateTable_a2c84e2e-936a-41d4-8c46-e9985f2f787f",
+            "mode": "import",
+            "source": {
+              "expression": "Calendar(Date(Year(MIN('LastRefresh'[LastRefresh])), 1, 1), Date(Year(MAX('LastRefresh'[LastRefresh])), 12, 31))",
+              "type": "calculated"
+            }
+          }
+        ],
+        "showAsVariationsOnly": true
+      },
+      {
+        "name": "Kontopost",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          },
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          }
+        ],
+        "columns": [
+          {
+            "name": "KontopostKod",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "string",
+            "isHidden": true,
+            "lineageTag": "bc699fc4-e7b6-43de-959c-1d656339f0fe",
+            "sourceColumn": "KontopostKod",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "KontopostnamnDetalj",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "05b2282c-862a-4772-ae18-c5bdb7b4babe",
+            "sourceColumn": "KontopostnamnDetalj",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Kontopostnamn",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "SortByColumn"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "d38468dd-1243-454c-9e39-91e6cd920b33",
+            "sortByColumn": "KontopostKod",
+            "sourceColumn": "Kontopostnamn",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "51f45d8e-6c78-4659-b83b-0deaef15217c",
+        "partitions": [
+          {
+            "name": "Kontopost",
+            "mode": "import",
+            "queryGroup": "Func",
+            "source": {
+              "expression": [
+                "let",
+                "    Source = { \"K16100\", \"K22200\" },",
+                "    #\"Converted to Table\" = Table.FromList(Source, Splitter.SplitByNothing(), null, null, ExtraValues.Error),",
+                "    #\"Renamed Columns\" = Table.RenameColumns(#\"Converted to Table\",{{\"Column1\", \"KontopostKod\"}}),",
+                "    #\"Added Custom\" = Table.AddColumn(#\"Renamed Columns\", \"KontopostnamnDetalj\", each if [KontopostKod] = \"K16100\" then \"1B30151A Utlåning, Sv, Säkerhet bostad, Hushåll\" ",
+                "else if [KontopostKod] = \"K22200\" then \"2010151A In-/upplåning, Sv, Hushåll\" else null),",
+                "    #\"Added Conditional Column\" = Table.AddColumn(#\"Added Custom\", \"Kontopostnamn\", each if [KontopostKod] = \"K16100\" then \"Utlåning bolån\" else if [KontopostKod] = \"K22200\" then \"Inlåning hushåll\" else null),",
+                "    #\"Changed Type\" = Table.TransformColumnTypes(#\"Added Conditional Column\",{{\"KontopostKod\", type text}, {\"KontopostnamnDetalj\", type text}, {\"Kontopostnamn\", type text}})",
+                "in",
+                "    #\"Changed Type\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "AndelNettotillvaxtDeltaRanta",
+        "annotations": [
+          {
+            "name": "PBI_Id",
+            "value": "ec23aee4cf674165b32f0b0f9e4ac3c6"
+          }
+        ],
+        "columns": [
+          {
+            "name": "@Share Of Net Growth",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "dataType": "double",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "876f2c6c-3019-40aa-8236-c2f2a43eb151",
+            "sourceColumn": "[@Share Of Net Growth]",
+            "summarizeBy": "sum",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "@Delata Avg Interest Rate",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "dataType": "double",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "8bddaca9-d536-46be-a985-3eab122481e8",
+            "sourceColumn": "[@Delata Avg Interest Rate]",
+            "summarizeBy": "sum",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "@Date",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "dateTime",
+            "formatString": "General Date",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "628b6fb7-1c86-4ca1-ad33-3d49e057dc07",
+            "sourceColumn": "[@Date]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn",
+            "variations": [
+              {
+                "name": "Variation",
+                "defaultHierarchy": {
+                  "hierarchy": "Date Hierarchy",
+                  "table": "LocalDateTable_dea9690c-9ca6-4275-834e-248643c94ce1"
+                },
+                "isDefault": true,
+                "relationship": "bb83993a-e07a-43c3-b83d-ef4a5df3787f"
+              }
+            ]
+          },
+          {
+            "name": "Month-Year",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "e359cabe-1f7e-41d3-b928-1df72786533b",
+            "sourceColumn": "Kalender[Month-Year]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Year",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "f6a281e6-6128-4d0c-81ff-09043858f2d6",
+            "sourceColumn": "Kalender[Year]",
+            "summarizeBy": "sum",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "InstitutsDetaljKod",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "69df155e-3520-4214-bd52-308da74c2b1a",
+            "sourceColumn": "Institut[InstitutsDetaljKod]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          }
+        ],
+        "isHidden": true,
+        "lineageTag": "389f49cf-234d-4f86-887e-9dc1f09aea14",
+        "partitions": [
+          {
+            "name": "AndelNettotillvaxtDeltaRanta",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "",
+                "CALCULATETABLE(",
+                "\tADDCOLUMNS(",
+                "        FILTER(",
+                "            SUMMARIZE(",
+                "                ALLNOBLANKROW( Marknadsandel )",
+                "                , Kalender[Month-Year]",
+                "                , Kalender[Year]",
+                "                , Institut[InstitutsdetaljKod]",
+                "            )",
+                "            , Kalender[Year] > 2016",
+                "        )",
+                "\t\t, \"@Date\", CALCULATE( MAX(Marknadsandel[Datum] ) )",
+                "\t\t, \"@Share Of Net Growth\", [Andel av nettotillväxt]",
+                "\t\t, \"@Delata Avg Interest Rate\",",
+                "\t\t\tvar _AvgInterestRateAllBanks = ",
+                "\t\t\t\tCALCULATE(",
+                "\t\t\t\t\tAVERAGEX(",
+                "\t\t\t\t\t\tInterestRates",
+                "\t\t\t\t\t\t,[InterestRateX1000000]",
+                "\t\t\t\t\t\t),",
+                "\t\t\t\t\t\tALL( Institut )",
+                "\t\t\t\t\t)",
+                "\t\t\tvar _AvgInterestRate = ",
+                "\t\t\t\tCALCULATE(",
+                "\t\t\t\t\tAVERAGEX(",
+                "\t\t\t\t\t\tInterestRates",
+                "\t\t\t\t\t\t, [InterestRateX1000000]",
+                "\t\t\t\t\t)",
+                "\t\t\t\t)",
+                "\t\t\tvar _Result =",
+                "\t\t\t\tDIVIDE( _AvgInterestRateAllBanks - _AvgInterestRate, 1000000 )",
+                "\t\t\tRETURN _Result",
+                "\t)",
+                "    , 'Context Time Intelligence'[Current Date] = \"MTD\"",
+                "\t, Kontopost[KontopostKod] = \"K16100\"",
+                "\t--, Kalender[Year] > 2016",
+                "    , REMOVEFILTERS( Kalender )",
+                ")"
+              ],
+              "type": "calculated"
+            }
+          }
+        ]
+      },
+      {
+        "name": "LocalDateTable_fabad3b2-637b-4490-94b3-351a1abe508c",
+        "annotations": [
+          {
+            "name": "__PBI_LocalDateTable",
+            "value": "true"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Date",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              }
+            ],
+            "dataCategory": "PaddedDateTableDates",
+            "dataType": "dateTime",
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "ce84dda0-c57f-4227-86d9-b44066a5c116",
+            "sourceColumn": "[Date]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Year",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Year"
+              }
+            ],
+            "dataCategory": "Years",
+            "dataType": "int64",
+            "expression": "YEAR([Date])",
+            "isHidden": true,
+            "lineageTag": "3485292a-18a9-4209-8e63-d554b6beef0f",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "MonthNo",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "MonthNumber"
+              }
+            ],
+            "dataCategory": "MonthOfYear",
+            "dataType": "int64",
+            "expression": "MONTH([Date])",
+            "isHidden": true,
+            "lineageTag": "c6c223a9-4965-4042-bf01-785a08253057",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Month",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Month"
+              }
+            ],
+            "dataCategory": "Months",
+            "dataType": "string",
+            "expression": "FORMAT([Date], \"MMMM\")",
+            "isHidden": true,
+            "lineageTag": "78949549-6844-4c7e-8112-93b60db2df87",
+            "sortByColumn": "MonthNo",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "QuarterNo",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "QuarterNumber"
+              }
+            ],
+            "dataCategory": "QuarterOfYear",
+            "dataType": "int64",
+            "expression": "INT(([MonthNo] + 2) / 3)",
+            "isHidden": true,
+            "lineageTag": "1d192fa9-50c8-47b7-8868-531afeb90db0",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Quarter",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Quarter"
+              }
+            ],
+            "dataCategory": "Quarters",
+            "dataType": "string",
+            "expression": "\"Qtr \" & [QuarterNo]",
+            "isHidden": true,
+            "lineageTag": "d1cd7819-8e55-4c27-90e4-93b4519f8611",
+            "sortByColumn": "QuarterNo",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Day",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Day"
+              }
+            ],
+            "dataCategory": "DayOfMonth",
+            "dataType": "int64",
+            "expression": "DAY([Date])",
+            "isHidden": true,
+            "lineageTag": "8eecead7-5a92-45bc-99c8-0bbc0583807b",
+            "summarizeBy": "none",
+            "type": "calculated"
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Date Hierarchy",
+            "annotations": [
+              {
+                "name": "TemplateId",
+                "value": "DateHierarchy"
+              }
+            ],
+            "levels": [
+              {
+                "name": "Year",
+                "column": "Year",
+                "lineageTag": "5e3f3ec7-5741-4ea4-a99e-85c8c6873ae2",
+                "ordinal": 0
+              },
+              {
+                "name": "Quarter",
+                "column": "Quarter",
+                "lineageTag": "203dc78b-6056-42b9-932f-fe8615fbb3e1",
+                "ordinal": 1
+              },
+              {
+                "name": "Month",
+                "column": "Month",
+                "lineageTag": "0e55dbe1-20f0-4041-82bc-fd1bcf9690f3",
+                "ordinal": 2
+              },
+              {
+                "name": "Day",
+                "column": "Day",
+                "lineageTag": "75764e72-1b41-4736-947a-fe30389dbdec",
+                "ordinal": 3
+              }
+            ],
+            "lineageTag": "ea675252-5783-4d40-8bc7-5aa61917e954"
+          }
+        ],
+        "isHidden": true,
+        "lineageTag": "849cee54-4da7-4cf8-a789-1183cef995f8",
+        "partitions": [
+          {
+            "name": "LocalDateTable_fabad3b2-637b-4490-94b3-351a1abe508c",
+            "mode": "import",
+            "source": {
+              "expression": "Calendar(Date(Year(MIN('Kalender'[Date])), 1, 1), Date(Year(MAX('Kalender'[Date])), 12, 31))",
+              "type": "calculated"
+            }
+          }
+        ],
+        "showAsVariationsOnly": true
+      },
+      {
+        "name": "Marknadsandel",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          },
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          }
+        ],
+        "columns": [
+          {
+            "name": "KontopostKod",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "string",
+            "isHidden": true,
+            "lineageTag": "b316f763-20b2-4944-88d4-73ed7f0fe7be",
+            "sourceColumn": "KontopostKod",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "ValutaKod",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "string",
+            "isHidden": true,
+            "lineageTag": "a5d5cfb8-1530-42e8-8517-34b09c46428b",
+            "sourceColumn": "ValutaKod",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "InstitutsdetaljKod",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "string",
+            "isHidden": true,
+            "lineageTag": "205b692f-502d-4605-937b-e4f04c5f7ecb",
+            "sourceColumn": "InstitutsdetaljKod",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Value",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "double",
+            "isHidden": true,
+            "lineageTag": "5e15e32d-e707-44f1-a451-d47711c3b9e3",
+            "sourceColumn": "Value",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "Datum",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "UnderlyingDateTimeDataType",
+                "value": "Date"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "dateTime",
+            "formatString": "Long Date",
+            "isHidden": true,
+            "lineageTag": "c2058ff5-3fce-467e-8d9f-3467b9095cc4",
+            "sourceColumn": "Datum",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "bff5e02e-8bfb-4bce-b89d-d8a47e9aeda1",
+        "measures": [
+          {
+            "name": "Volym",
+            "annotations": [
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "displayFolder": "Basic measures",
+            "expression": [
+              "",
+              "var _MaxDateMarknadsandelMonth = MAX( Marknadsandel[Datum] ) ",
+              "var _MaxDateMarknadsandelQuarter = MAX( 'Marknadsandel Quarter Func'[Datum] )",
+              "var _MaxDateMarknadsandelYear = MAX( 'Marknadsandel Year Func'[Datum] )",
+              "var _VolymMonth =",
+              "    CALCULATE(",
+              "        SUM( Marknadsandel[Value] )",
+              "        , Kalender[Date] = _MaxDateMarknadsandelMonth",
+              "    )",
+              "var _VolymQuarter =",
+              "    CALCULATE(",
+              "        SUM( 'Marknadsandel Quarter Func'[Value] )",
+              "        , Kalender[Date] = _MaxDateMarknadsandelQuarter",
+              "    )",
+              "var _VolymYear =",
+              "    CALCULATE(",
+              "        SUM( 'Marknadsandel Year Func'[Value] )",
+              "        , Kalender[Date] = _MaxDateMarknadsandelYear",
+              "    )",
+              "var _Result =",
+              "    SWITCH(",
+              "        TRUE()",
+              "        , SELECTEDVALUE( 'Context Time Intelligence'[Current Date] ) = \"MTD\", _VolymMonth",
+              "        , SELECTEDVALUE( 'Context Time Intelligence'[Current Date] ) = \"QTD\", _VolymQuarter",
+              "        , _VolymYear",
+              "    )",
+              "return IF( _Result > 0, _Result )"
+            ],
+            "lineageTag": "790f9388-b8a1-45e6-a566-cc8637afe7e5"
+          },
+          {
+            "name": "Tillväxt",
+            "annotations": [
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "displayFolder": "Basic measures",
+            "expression": [
+              "",
+              "var _CurrentStock = [Volym]",
+              "var _StockPrevMonth =",
+              "    CALCULATE(",
+              "        [Volym]",
+              "        , PREVIOUSMONTH( Kalender[Date] )",
+              "    )",
+              "var _PrevRankQuarter = ",
+              "    MAXX( ",
+              "        'Marknadsandel Quarter Func'",
+              "        , CALCULATE( ",
+              "            MAX( 'Marknadsandel Quarter Func'[@Rank] )  - 1 ",
+              "        ) ",
+              "    )",
+              "var _StockPrevQuarter = ",
+              "    CALCULATE( ",
+              "        SUM( 'Marknadsandel Quarter Func'[Value] )",
+              "        , 'Marknadsandel Quarter Func'[@Rank] = _PrevRankQuarter",
+              "        , ALL( Kalender ) ",
+              "    )",
+              "var _PrevRankYear = ",
+              "    MAXX( ",
+              "        'Marknadsandel Year Func'",
+              "        , CALCULATE( ",
+              "            MAX( 'Marknadsandel Year Func'[@Rank] )  - 1 ",
+              "        ) ",
+              "    )",
+              "var _StockPrevYear = ",
+              "    CALCULATE( ",
+              "        SUM( 'Marknadsandel Year Func'[Value] )",
+              "        , 'Marknadsandel Year Func'[@Rank] = _PrevRankYear",
+              "        , ALL( Kalender ) ",
+              "    )",
+              "var _TillvaxtQuarter = IF( _StockPrevQuarter && _CurrentStock, _CurrentStock - _StockPrevQuarter )",
+              "var _TillvaxtMonth = IF( _StockPrevMonth && _CurrentStock, _CurrentStock - _StockPrevMonth )",
+              "var _TillvaxtYear = IF( _StockPrevYear && _CurrentStock, _CurrentStock - _StockPrevYear )",
+              "var _Result =",
+              "    SWITCH(",
+              "        TRUE()",
+              "        , MAX( 'Context Time Intelligence'[Current Date] ) = \"MTD\", _TillvaxtMonth",
+              "        , MAX( 'Context Time Intelligence'[Current Date] ) = \"QTD\", _TillvaxtQuarter",
+              "        , _TillvaxtYear",
+              "    )",
+              "return",
+              "    _Result"
+            ],
+            "lineageTag": "0b0c38dd-e7fb-46d7-89e8-d917c6b150ec"
+          },
+          {
+            "name": "Volym All Institut",
+            "annotations": [
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "displayFolder": "Other measures",
+            "expression": [
+              "",
+              "CALCULATE( [Volym], ALL( Institut ) )"
+            ],
+            "lineageTag": "96d957c3-d0eb-45a0-a286-3e611f222bf0"
+          },
+          {
+            "name": "Tillväxt All Institut",
+            "annotations": [
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "displayFolder": "Other measures",
+            "expression": [
+              "",
+              "var _CurrentStock = [Volym All Institut]",
+              "var _StockPrevMonth =",
+              "    CALCULATE(",
+              "        [Volym All Institut]",
+              "        , PREVIOUSMONTH( Kalender[Date] )",
+              "    )",
+              "var _PrevRankQuarter = ",
+              "    MAXX( ",
+              "        'Marknadsandel Quarter Func'",
+              "        , CALCULATE( ",
+              "            MAX( 'Marknadsandel Quarter Func'[@Rank] )  - 1 ",
+              "        ) ",
+              "    )",
+              "var _StockPrevQuarter = ",
+              "    CALCULATE( ",
+              "        SUM( 'Marknadsandel Quarter Func'[Value] )",
+              "        , 'Marknadsandel Quarter Func'[@Rank] = _PrevRankQuarter",
+              "        , ALL( Kalender ) ",
+              "        , ALL( Institut )",
+              "    )",
+              "var _PrevRankYear = ",
+              "    MAXX( ",
+              "        'Marknadsandel Year Func'",
+              "        , CALCULATE( ",
+              "            MAX( 'Marknadsandel Year Func'[@Rank] )  - 1 ",
+              "        ) ",
+              "    )",
+              "var _StockPrevYear = ",
+              "    CALCULATE( ",
+              "        SUM( 'Marknadsandel Year Func'[Value] )",
+              "        , 'Marknadsandel Year Func'[@Rank] = _PrevRankYear",
+              "        , ALL( Kalender ) ",
+              "        , ALL( Institut )",
+              "    )",
+              "var _TillvaxtQuarter = IF( _StockPrevQuarter && _CurrentStock, _CurrentStock - _StockPrevQuarter )",
+              "var _TillvaxtMonth = IF( _StockPrevMonth && _CurrentStock, _CurrentStock - _StockPrevMonth )",
+              "var _TillvaxtYear = IF( _StockPrevYear && _CurrentStock, _CurrentStock - _StockPrevYear )",
+              "var _Result =",
+              "    SWITCH(",
+              "        TRUE()",
+              "        , MAX( 'Context Time Intelligence'[Current Date] ) = \"MTD\", _TillvaxtMonth",
+              "        , MAX( 'Context Time Intelligence'[Current Date] ) = \"QTD\", _TillvaxtQuarter",
+              "        , _TillvaxtYear",
+              "    )",
+              "return",
+              "    _Result"
+            ],
+            "lineageTag": "c7035ebf-44bd-4723-9b71-4474e0eb8768"
+          },
+          {
+            "name": "Andel av nettotillväxt",
+            "displayFolder": "Basic measures",
+            "expression": [
+              "",
+              "var _Result = DIVIDE( [Tillväxt], [Tillväxt All Institut] )",
+              "return IF( [Tillväxt All Institut] < 0, _Result * - 1, _Result )"
+            ],
+            "formatString": "0.00\\ %;-0.00\\ %;0.00\\ %",
+            "lineageTag": "15629968-7d68-417d-b821-a4d5cc2c2bea"
+          },
+          {
+            "name": "Tillväxt %",
+            "displayFolder": "Other measures",
+            "expression": "DIVIDE( [Tillväxt], [Volym] )",
+            "formatString": "0.00\\ %;-0.00\\ %;0.00\\ %",
+            "lineageTag": "9a934d5a-3d14-412e-976e-8663681d01f3"
+          },
+          {
+            "name": "Tillväxt % All Institut",
+            "annotations": [
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "displayFolder": "Other measures",
+            "expression": "DIVIDE( [Tillväxt All Institut], [Volym All Institut] )",
+            "lineageTag": "02bd3025-6505-45c0-ad0a-a2e8a8c85aaf"
+          },
+          {
+            "name": "Tillväxt All Institut årstakt",
+            "displayFolder": "Other measures",
+            "expression": [
+              "",
+              "var _MonthNr = MAX( Kalender[Month] )",
+              "var _Multiplicator = DIVIDE( 12, _MonthNr )",
+              "var _TillvaxtAllInstitut = [Tillväxt % All Institut]",
+              "var _Result =",
+              "    SWITCH(",
+              "        TRUE()",
+              "        , SELECTEDVALUE( 'Context Time Intelligence'[Current Date] ) = \"MTD\", _TillvaxtAllInstitut * 12",
+              "        , SELECTEDVALUE( 'Context Time Intelligence'[Current Date] ) = \"QTD\", _TillvaxtAllInstitut * 4",
+              "        , _TillvaxtAllInstitut * _Multiplicator",
+              "    )",
+              "return _Result"
+            ],
+            "formatString": "0.00\\ %;-0.00\\ %;0.00\\ %",
+            "lineageTag": "00a7e221-f142-4191-bad7-069dc877de1d"
+          },
+          {
+            "name": "Tillväxt årstakt",
+            "displayFolder": "Other measures",
+            "expression": [
+              "",
+              "var _MonthNr = MAX( Kalender[Month] )",
+              "var _Multiplicator = DIVIDE( 12, _MonthNr )",
+              "var _TillvaxtAllInstitut = [Tillväxt %]",
+              "var _Result =",
+              "    SWITCH(",
+              "        TRUE()",
+              "        , SELECTEDVALUE( 'Context Time Intelligence'[Current Date] ) = \"MTD\", _TillvaxtAllInstitut * 12",
+              "        , SELECTEDVALUE( 'Context Time Intelligence'[Current Date] ) = \"QTD\", _TillvaxtAllInstitut * 4",
+              "        , _TillvaxtAllInstitut * _Multiplicator",
+              "    )",
+              "return _Result"
+            ],
+            "formatString": "0.00\\ %;-0.00\\ %;0.00\\ %",
+            "lineageTag": "bee0d4dc-aa61-456b-8866-bc1b5b862de9"
+          },
+          {
+            "name": "Title Start",
+            "displayFolder": "Titles",
+            "expression": [
+              "",
+              "SELECTEDVALUE( Kontopost[Kontopostnamn] ) & \" | \" & ",
+              "SELECTEDVALUE( Institut[Institutsnamn] ) & \" | \" & ",
+              "SELECTEDVALUE( 'Context Time Intelligence'[Current Date] ) & \" \" &",
+              "var _MaxDateFact = MAX( Marknadsandel[Datum] )",
+              "var _Result = CALCULATE( MAX( Kalender[End of Month] ), Kalender[Date] = _MaxDateFact )",
+              "return FORMAT( _Result, \"YYYY-MM-DD\" )"
+            ],
+            "lineageTag": "3a2a6fd4-c87a-49bd-bd6e-96d564e02044"
+          },
+          {
+            "name": "Marknadsandel",
+            "displayFolder": "Basic measures",
+            "expression": "DIVIDE( [Volym], [Volym All Institut] )",
+            "formatString": "0.00\\ %;-0.00\\ %;0.00\\ %",
+            "lineageTag": "73a7d60a-a50c-4fd2-af0d-bea511d89e9f"
+          },
+          {
+            "name": "Marknadsandel LY",
+            "annotations": [
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "displayFolder": "Time intelligence",
+            "expression": [
+              "",
+              "CALCULATE( [Marknadsandel], PREVIOUSYEAR( Kalender[Date] ) )"
+            ],
+            "lineageTag": "3a8c4f82-129d-47b9-b471-de2cc95d1768"
+          },
+          {
+            "name": "Marknadsandel SPLY",
+            "annotations": [
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "displayFolder": "Time intelligence",
+            "expression": "CALCULATE( [Marknadsandel], SAMEPERIODLASTYEAR( Kalender[Date] ) )",
+            "lineageTag": "42e6f6f0-0ac5-4d21-ae37-8e9900ac7d16"
+          },
+          {
+            "name": "Image URL",
+            "displayFolder": "Help measures",
+            "expression": "SELECTEDVALUE( Institut[Image URL] )",
+            "lineageTag": "c7a67d0c-ef3d-40c8-a126-2ac2c8d116dd"
+          },
+          {
+            "name": "MarknadsandekarLabel",
+            "displayFolder": "Help measures",
+            "expression": "FORMAT( [Marknadsandel], \"0.0%\" )",
+            "lineageTag": "3df0e417-da75-4728-afa2-4add24bc4e8e"
+          },
+          {
+            "name": "Hex code",
+            "displayFolder": "Help measures",
+            "expression": "SELECTEDVALUE( 'Institut Disconnected'[Hex code] )",
+            "lineageTag": "0dc59eb1-5c99-42a5-8b7e-968104d27639"
+          },
+          {
+            "name": "Y-Axis max range",
+            "displayFolder": "Dynamic axis",
+            "expression": [
+              "",
+              "var _SlicerChild = ",
+              "    SUMX(",
+              "        VALUES( 'Institut Disconnected'[Institutsnamn] )",
+              "        , [Marknadsandel] * 2",
+              "    )",
+              "var _SlicerParent =",
+              "    MAXX( ",
+              "        VALUES( Institut[Institutsgrupp] )",
+              "        , [Marknadsandel] * 2 ",
+              "    )",
+              "var _Result =",
+              "    IF( SELECTEDVALUE( 'Institut Disconnected'[InstitutsOrder] ) IN VALUES( Institut[InstitutsOrder] ), _SlicerChild, _SlicerParent )",
+              "return",
+              "    _Result"
+            ],
+            "formatString": "0.00\\ %;-0.00\\ %;0.00\\ %",
+            "lineageTag": "397b0d4e-cc56-4a22-81cc-b445cfd906df"
+          },
+          {
+            "name": "Y-Axis min range",
+            "displayFolder": "Dynamic axis",
+            "expression": [
+              "",
+              "var _SlicerChild =",
+              "    SUMX(",
+              "        VALUES( 'Institut Disconnected'[Institutsnamn] )",
+              "        , [Marknadsandel] * 2 * -1",
+              "    )",
+              "var _SlicerParent =",
+              "    MAXX(",
+              "        VALUES( Institut[Institutsgrupp] )",
+              "        , [Marknadsandel] * 2 * -1",
+              "    )",
+              "var _Result =",
+              "    IF( SELECTEDVALUE( 'Institut Disconnected'[InstitutsOrder] ) IN VALUES( Institut[InstitutsOrder] ), _SlicerChild, _SlicerParent )",
+              "return",
+              "    _Result"
+            ],
+            "formatString": "0.00\\ %;-0.00\\ %;0.00\\ %",
+            "lineageTag": "8956f727-d64d-4cfc-96f9-cb525faae806"
+          },
+          {
+            "name": "CrossSlicer",
+            "displayFolder": "Help measures",
+            "expression": [
+              "",
+              "var _ValuesInstitutsGroup = VALUES( Institut[InstitutsOrder] )",
+              "var _Result =",
+              "    MAXX( ",
+              "        ALL('Institut Disconnected'[InstitutsOrder])",
+              "        , IF( VALUES( 'Institut Disconnected'[InstitutsOrder] ) IN _ValuesInstitutsGroup, 1, 0 )",
+              "    )",
+              "RETURN _Result"
+            ],
+            "formatString": "0",
+            "lineageTag": "89b0aaee-5a74-446f-a7d8-1afac5dcbb6f"
+          },
+          {
+            "name": "Tillväxt under marknadsandel",
+            "displayFolder": "Tillväxt vs marknadsandel",
+            "expression": [
+              "",
+              "    IF( [Marknadsandel] < [Andel av nettotillväxt]",
+              "        , [Marknadsandel]",
+              "        , IF( [Andel av nettotillväxt] > 0",
+              "            , [Andel av nettotillväxt] ",
+              "        ) ",
+              "    )"
+            ],
+            "formatString": "0.00\\ %;-0.00\\ %;0.00\\ %",
+            "lineageTag": "4a3f63b6-d590-4939-aaaf-cefdfbdc4aa8"
+          },
+          {
+            "name": "Negativ tillväxt",
+            "displayFolder": "Tillväxt vs marknadsandel",
+            "expression": "IF(  [Andel av nettotillväxt] < 0,  [Andel av nettotillväxt] )",
+            "formatString": "0\\ %;-0\\ %;0\\ %",
+            "lineageTag": "58d5677a-89a9-4f40-bf05-4d26e0cfdd47"
+          },
+          {
+            "name": "Tillväxt över marknadsandel",
+            "displayFolder": "Tillväxt vs marknadsandel",
+            "expression": [
+              "",
+              "    IF ( [Andel av nettotillväxt] > [Marknadsandel], [Andel av nettotillväxt] - [Marknadsandel] )"
+            ],
+            "formatString": "0.00\\ %;-0.00\\ %;0.00\\ %",
+            "lineageTag": "f7ca045b-75d1-4207-8373-98f2991831c6"
+          },
+          {
+            "name": "Title Analys",
+            "displayFolder": "Titles",
+            "expression": [
+              "",
+              "SELECTEDVALUE( Kontopost[Kontopostnamn] ) & \" | \" & ",
+              "IF( SELECTEDVALUE( 'Institut Disconnected'[InstitutsOrder] ) IN VALUES( Institut[InstitutsOrder] )",
+              "    , SELECTEDVALUE( Institut[Institutsnamn] )",
+              "    , SELECTEDVALUE( Institut[Institutsgrupp] ) ",
+              ") & \" | YTD \" & ",
+              "var _MaxDateFact = MAX( Marknadsandel[Datum] )",
+              "var _Result = CALCULATE( MAX( Kalender[End of Month] ), Kalender[Date] = _MaxDateFact )",
+              "return FORMAT( _Result, \"YYYY-MM-DD\" )"
+            ],
+            "lineageTag": "56a008fb-e251-4bb4-b1cb-5fc8d019a90c"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Marknadsandel",
+            "mode": "import",
+            "queryGroup": "Func",
+            "source": {
+              "expression": [
+                "let",
+                "    Source = Table.Combine({MarknadsandelGrund, OvrigaAktorar}),",
+                "    #\"Filtered Rows\" = Table.SelectRows(Source, each ([InstitutsdetaljKod] <> \"S21\"))",
+                "in",
+                "    #\"Filtered Rows\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Institut",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Institutsnamn",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "SortByColumn"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "13a13232-b37c-463c-8c30-5f8e26d48edb",
+            "sourceColumn": "Institutsnamn",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "InstitutsDetaljNamn",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "df772e2d-a7a9-45b0-b5e3-823b0f5c6f61",
+            "sourceColumn": "InstitutsDetaljNamn",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "InstitutsDetaljKod",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "string",
+            "isHidden": true,
+            "lineageTag": "a984181a-0398-4b60-b319-78089796daa7",
+            "sourceColumn": "InstitutsDetaljKod",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Institutsgrupp",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "e5d5003c-a826-4d5f-9973-abe40d65569d",
+            "sourceColumn": "Institutsgrupp",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Image URL",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataCategory": "ImageUrl",
+            "dataType": "string",
+            "isHidden": true,
+            "lineageTag": "68a4db99-f316-4498-82bc-378486a50a4b",
+            "sourceColumn": "Image URL",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "InstitutsOrder",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "dataType": "double",
+            "lineageTag": "5a5b010a-9012-481d-a87c-e931d56043c0",
+            "sourceColumn": "InstitutsOrder",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "Hex code",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "c03003f6-36b1-4a3f-8952-67c0112fd955",
+            "sourceColumn": "Hex code",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "48282b3e-4997-4a0c-a5b0-286f16a807a9",
+        "partitions": [
+          {
+            "name": "Institut",
+            "mode": "import",
+            "queryGroup": "Func",
+            "source": {
+              "expression": [
+                "let",
+                "    Source = SharePoint.Tables(\"https://skandianet-my.sharepoint.com/personal/aleksandar_kovacevic_skandia_se/\", [Implementation=\"2.0\", ViewMode=\"Default\"]),",
+                "    #\"f478f404-5072-496b-b3ea-a33fd8c0c702\" = Source{[Id=\"f478f404-5072-496b-b3ea-a33fd8c0c702\"]}[Items],",
+                "    #\"Expanded Lookup Bank\" = Table.ExpandListColumn(#\"f478f404-5072-496b-b3ea-a33fd8c0c702\", \"Lookup Institutsnamn\"),",
+                "    #\"Expanded Lookup Bank1\" = Table.ExpandRecordColumn(#\"Expanded Lookup Bank\", \"Lookup Institutsnamn\", {\"lookupValue\"}, {\"lookupValue\"}),",
+                "    #\"Removed Columns\" = Table.RemoveColumns(#\"Expanded Lookup Bank1\",{\"ID\"}),",
+                "    #\"Renamed Columns\" = Table.RenameColumns(#\"Removed Columns\",{{\"lookupValue\", \"Institutsnamn\"}}),",
+                "    #\"Changed Type\" = Table.TransformColumnTypes(#\"Renamed Columns\",{{\"InstitutsDetaljNamn\", type text}, {\"Institutsnamn\", type text}}),",
+                "    #\"Merged Queries\" = Table.NestedJoin(#\"Changed Type\", {\"Institutsnamn\"}, InstitutsGrupp, {\"Institutsnamn\"}, \"InstitutsGruppFunc\", JoinKind.LeftOuter),",
+                "    #\"Expanded InstitutsGruppFunc\" = Table.ExpandTableColumn(#\"Merged Queries\", \"InstitutsGruppFunc\", {\"Institutsgrupp\", \"Image URL\", \"InstitutsOrder\", \"Hex code\"}, {\"Institutsgrupp\", \"Image URL\", \"InstitutsOrder\", \"Hex code\"})",
+                "in",
+                "    #\"Expanded InstitutsGruppFunc\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Valuta",
+        "annotations": [
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          },
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navigation"
+          }
+        ],
+        "columns": [
+          {
+            "name": "ValutaKod",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "string",
+            "isHidden": true,
+            "lineageTag": "4480c869-d6b2-4cb1-a7ec-40239d892a18",
+            "sourceColumn": "ValutaKod",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Valuta",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "SortByColumn"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "f0cfb8bd-b892-4716-9b35-498783efeb45",
+            "sortByColumn": "ValutaOrder",
+            "sourceColumn": "Valuta",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "ValutaOrder",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "IsHidden"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "isHidden": true,
+            "lineageTag": "ee362cc0-d4b1-437d-aef7-8c541a46ba67",
+            "sourceColumn": "ValutaOrder",
+            "summarizeBy": "sum"
+          }
+        ],
+        "lineageTag": "863b273e-7c72-4620-ad82-d502ad745fbf",
+        "partitions": [
+          {
+            "name": "Valuta",
+            "mode": "import",
+            "queryGroup": "Func",
+            "source": {
+              "expression": [
+                "let",
+                "    Source = { \"v0\", \"v1\", \"v2\" },",
+                "    #\"Converted to Table\" = Table.FromList(Source, Splitter.SplitByNothing(), null, null, ExtraValues.Error),",
+                "    #\"Renamed Columns\" = Table.RenameColumns(#\"Converted to Table\",{{\"Column1\", \"ValutaKod\"}}),",
+                "    #\"Changed Type\" = Table.TransformColumnTypes(#\"Renamed Columns\",{{\"ValutaKod\", type text}}),",
+                "    #\"Added Conditional Column\" = Table.AddColumn(#\"Changed Type\", \"Valuta\", each if [ValutaKod] = \"v0\" then \"Total valuta\" else if [ValutaKod] = \"v1\" then \"Utländsk valuta\" else if [ValutaKod] = \"v2\" then \"Svenska kronor\" else null, type text),",
+                "    Custom1 = Table.AddColumn(#\"Added Conditional Column\", \"ValutaOrder\", each if [ValutaKod] = \"v0\" then 3 else if [ValutaKod] = \"v1\" then 2 else if [ValutaKod] = \"v2\" then 1 else null, Int64.Type)",
+                "in",
+                "    Custom1"
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Marknadsandel Quarter Func",
+        "annotations": [
+          {
+            "name": "PBI_Id",
+            "value": "5ab0e8ebbf8f442abc035d66144e733b"
+          }
+        ],
+        "columns": [
+          {
+            "name": "KontopostKod",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "73f7a4f6-3a3a-4d22-adad-9473833f3667",
+            "sourceColumn": "Marknadsandel[KontopostKod]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "ValutaKod",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "167f5671-7c14-44ea-9e87-2b06cfdd8aa5",
+            "sourceColumn": "Marknadsandel[ValutaKod]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "InstitutsdetaljKod",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "9a68f3b2-140f-4691-9d73-cb8e4d0829d4",
+            "sourceColumn": "Marknadsandel[InstitutsdetaljKod]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Value",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "dataType": "double",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "a1c6424d-0b89-4b61-87bf-d651a9167733",
+            "sourceColumn": "Marknadsandel[Value]",
+            "summarizeBy": "sum",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Datum",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "dateTime",
+            "formatString": "General Date",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "d43d5da9-4f8b-417b-871e-ea60f8e3b7af",
+            "sourceColumn": "Marknadsandel[Datum]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "@Rank",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "8e2fa99c-f17a-4edf-b162-e7f26ca2bd36",
+            "sourceColumn": "[@Rank]",
+            "summarizeBy": "sum",
+            "type": "calculatedTableColumn"
+          }
+        ],
+        "isHidden": true,
+        "lineageTag": "17b2c14d-ba2e-438d-857c-4db4fb5ba1f2",
+        "partitions": [
+          {
+            "name": "Marknadsandel Quarter Func",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "",
+                "\tVAR _MaxDatumFact = CALCULATE( MAX('Marknadsandel'[Datum]), ALL( Kalender ) )",
+                "\tVAR _MarknadasandelYear =  FILTER(",
+                "\t\t'Marknadsandel',",
+                "\t\tMONTH('Marknadsandel'[Datum]) IN { 12, 9, 6, 3  } || 'Marknadsandel'[Datum] = _MaxDatumFact",
+                "\t) ",
+                "\tVAR _Result = ADDCOLUMNS(",
+                "\t\t_MarknadasandelYear,",
+                "\t\t\"@Rank\", RANK(",
+                "\t\t\tDENSE,",
+                "\t\t\t_MarknadasandelYear,",
+                "\t\t\tORDERBY(",
+                "\t\t\t\t'Marknadsandel'[Datum],",
+                "\t\t\t\tASC",
+                "\t\t\t),",
+                "\t\t\tPARTITIONBY('Marknadsandel'[InstitutsdetaljKod], Marknadsandel[KontopostKod], Marknadsandel[ValutaKod])",
+                "\t\t)",
+                "\t)",
+                "\tRETURN",
+                "\t\t_Result"
+              ],
+              "type": "calculated"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Marknadsandel Year Func",
+        "annotations": [
+          {
+            "name": "PBI_Id",
+            "value": "3d85558b7ab849b09a3b3108e5d3f8f8"
+          }
+        ],
+        "columns": [
+          {
+            "name": "KontopostKod",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "1aadc245-adec-461c-a3b8-cd1392f965a3",
+            "sourceColumn": "Marknadsandel[KontopostKod]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "ValutaKod",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "1186baf4-cc87-460f-97ed-90624b2090bc",
+            "sourceColumn": "Marknadsandel[ValutaKod]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "InstitutsdetaljKod",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "a5bc3da5-1970-4709-a85b-cadccd411048",
+            "sourceColumn": "Marknadsandel[InstitutsdetaljKod]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Value",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "dataType": "double",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "63f82b37-dcb3-49cc-89bb-8a5d65559075",
+            "sourceColumn": "Marknadsandel[Value]",
+            "summarizeBy": "sum",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Datum",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "dateTime",
+            "formatString": "General Date",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "44a0829b-803d-454b-9c8a-913824175d57",
+            "sourceColumn": "Marknadsandel[Datum]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "@Rank",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "9e420e3a-4608-4806-ab05-cb19380ef710",
+            "sourceColumn": "[@Rank]",
+            "summarizeBy": "sum",
+            "type": "calculatedTableColumn"
+          }
+        ],
+        "isHidden": true,
+        "lineageTag": "39293287-48bf-4464-afe4-1a30f584cde8",
+        "partitions": [
+          {
+            "name": "Marknadsandel Year Func",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "",
+                "\tVAR _MaxDatumFact = CALCULATE( MAX('Marknadsandel'[Datum]), ALL( Kalender ) )",
+                "\tVAR _MarknadasandelYear =  FILTER(",
+                "\t\t'Marknadsandel',",
+                "\t\tMONTH('Marknadsandel'[Datum]) = 12 || 'Marknadsandel'[Datum] = _MaxDatumFact",
+                "\t) ",
+                "\tVAR _Result = ADDCOLUMNS(",
+                "\t\t_MarknadasandelYear,",
+                "\t\t\"@Rank\", RANK(",
+                "\t\t\tDENSE,",
+                "\t\t\t_MarknadasandelYear,",
+                "\t\t\tORDERBY(",
+                "\t\t\t\t'Marknadsandel'[Datum],",
+                "\t\t\t\tASC",
+                "\t\t\t),",
+                "\t\t\tPARTITIONBY('Marknadsandel'[InstitutsdetaljKod], Marknadsandel[KontopostKod], Marknadsandel[ValutaKod])",
+                "\t\t)",
+                "\t)",
+                "\tRETURN",
+                "\t\t_Result"
+              ],
+              "type": "calculated"
+            }
+          }
+        ]
+      },
+      {
+        "name": "MeasureSlicer Func",
+        "annotations": [
+          {
+            "name": "PBI_Id",
+            "value": "7613a369c8f84eac91050dd172bf7a64"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Select measure Func",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "isNameInferred": false,
+            "lineageTag": "7e6c0765-cd60-4b4d-8822-7e032405be6a",
+            "relatedColumnDetails": {
+              "groupByColumns": [
+                {
+                  "groupingColumn": "Select measure Func Fields"
+                }
+              ]
+            },
+            "sortByColumn": "Select measure Func Order",
+            "sourceColumn": "[Value1]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Select measure Func Fields",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "extendedProperties": [
+              {
+                "name": "ParameterMetadata",
+                "type": "json",
+                "value": {
+                  "kind": 2,
+                  "version": 3
+                }
+              }
+            ],
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": false,
+            "lineageTag": "1a9710fe-999d-46aa-8047-a48719ceef47",
+            "sortByColumn": "Select measure Func Order",
+            "sourceColumn": "[Value2]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Select measure Func Order",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "formatString": "0",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": false,
+            "lineageTag": "682ed9ac-17b9-449a-a8bb-e4638ba8eb5a",
+            "sourceColumn": "[Value3]",
+            "summarizeBy": "sum",
+            "type": "calculatedTableColumn"
+          }
+        ],
+        "lineageTag": "56137b58-910c-4dfa-bbae-d26cf5fed69e",
+        "partitions": [
+          {
+            "name": "MeasureSlicer Func",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "{",
+                "    (\"Marknadsandel\", NAMEOF('Marknadsandel'[Marknadsandel]), 0),",
+                "    (\"Andel av nettotillväxt\", NAMEOF('Marknadsandel'[Andel av nettotillväxt]), 1),",
+                "    (\"Tillväxt\", NAMEOF('Marknadsandel'[Tillväxt %]), 2)",
+                "}"
+              ],
+              "type": "calculated"
+            }
+          }
+        ]
+      },
+      {
+        "name": "LocalDateTable_dea9690c-9ca6-4275-834e-248643c94ce1",
+        "annotations": [
+          {
+            "name": "__PBI_LocalDateTable",
+            "value": "true"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Date",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              }
+            ],
+            "dataCategory": "PaddedDateTableDates",
+            "dataType": "dateTime",
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "7a820832-4cad-4dfe-8ed8-198b841c9e32",
+            "sourceColumn": "[Date]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Year",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Year"
+              }
+            ],
+            "dataCategory": "Years",
+            "dataType": "int64",
+            "expression": "YEAR([Date])",
+            "isHidden": true,
+            "lineageTag": "7b65d5f9-8e10-4d50-b36b-518a386903cb",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "MonthNo",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "MonthNumber"
+              }
+            ],
+            "dataCategory": "MonthOfYear",
+            "dataType": "int64",
+            "expression": "MONTH([Date])",
+            "isHidden": true,
+            "lineageTag": "b5496e1e-058e-4fd8-a776-cf0848fe58e6",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Month",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Month"
+              }
+            ],
+            "dataCategory": "Months",
+            "dataType": "string",
+            "expression": "FORMAT([Date], \"MMMM\")",
+            "isHidden": true,
+            "lineageTag": "38bc7820-a4c3-4c32-8493-ceb46852a954",
+            "sortByColumn": "MonthNo",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "QuarterNo",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "QuarterNumber"
+              }
+            ],
+            "dataCategory": "QuarterOfYear",
+            "dataType": "int64",
+            "expression": "INT(([MonthNo] + 2) / 3)",
+            "isHidden": true,
+            "lineageTag": "029420c5-c0f2-4955-8460-177b54a477c5",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Quarter",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Quarter"
+              }
+            ],
+            "dataCategory": "Quarters",
+            "dataType": "string",
+            "expression": "\"Qtr \" & [QuarterNo]",
+            "isHidden": true,
+            "lineageTag": "8f9af2f3-7a25-43f3-a349-b340643dccfe",
+            "sortByColumn": "QuarterNo",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Day",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Day"
+              }
+            ],
+            "dataCategory": "DayOfMonth",
+            "dataType": "int64",
+            "expression": "DAY([Date])",
+            "isHidden": true,
+            "lineageTag": "738082a2-dbc8-45c7-a2fd-566409658c51",
+            "summarizeBy": "none",
+            "type": "calculated"
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Date Hierarchy",
+            "annotations": [
+              {
+                "name": "TemplateId",
+                "value": "DateHierarchy"
+              }
+            ],
+            "levels": [
+              {
+                "name": "Year",
+                "column": "Year",
+                "lineageTag": "49dfc532-0199-4903-824b-7c39b32ba509",
+                "ordinal": 0
+              },
+              {
+                "name": "Quarter",
+                "column": "Quarter",
+                "lineageTag": "55f45904-7703-4df8-948a-310009fa58a8",
+                "ordinal": 1
+              },
+              {
+                "name": "Month",
+                "column": "Month",
+                "lineageTag": "16deffa2-606e-4114-8066-10d33233ecd7",
+                "ordinal": 2
+              },
+              {
+                "name": "Day",
+                "column": "Day",
+                "lineageTag": "45009af3-4dfb-4c63-947f-b906f14bb917",
+                "ordinal": 3
+              }
+            ],
+            "lineageTag": "2edf07d9-bbab-46cb-a8c5-ee900f1ae208"
+          }
+        ],
+        "isHidden": true,
+        "lineageTag": "ea73948b-ec82-41bd-8a84-5293f3eec1b9",
+        "partitions": [
+          {
+            "name": "LocalDateTable_dea9690c-9ca6-4275-834e-248643c94ce1",
+            "mode": "import",
+            "source": {
+              "expression": "Calendar(Date(Year(MIN('AndelNettotillvaxtDeltaRanta'[@Date])), 1, 1), Date(Year(MAX('AndelNettotillvaxtDeltaRanta'[@Date])), 12, 31))",
+              "type": "calculated"
+            }
+          }
+        ],
+        "showAsVariationsOnly": true
+      },
+      {
+        "name": "Institut Disconnected",
+        "annotations": [
+          {
+            "name": "PBI_Id",
+            "value": "acdbd03f38ec4bada69a3392e4bd620e"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Institutsnamn",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "isNameInferred": true,
+            "lineageTag": "ab1398c4-a110-42f3-b265-79ff74281065",
+            "sortByColumn": "InstitutsOrder",
+            "sourceColumn": "Institut[Institutsnamn]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "InstitutsDetaljNamn",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "isNameInferred": true,
+            "lineageTag": "82a426ac-d0d0-4640-bcd8-0a9e5ca8f91f",
+            "sourceColumn": "Institut[InstitutsDetaljNamn]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "InstitutsDetaljKod",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "isNameInferred": true,
+            "lineageTag": "70fd4280-bdd3-4f7d-92a7-606c4651af79",
+            "sourceColumn": "Institut[InstitutsDetaljKod]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Institutsgrupp",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "isNameInferred": true,
+            "lineageTag": "e951d1f5-f2b3-4301-9544-479549e8715a",
+            "sourceColumn": "Institut[Institutsgrupp]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Image URL",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "isNameInferred": true,
+            "lineageTag": "56783372-b876-4fb7-8d58-a7006b389606",
+            "sourceColumn": "Institut[Image URL]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "InstitutsOrder",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              },
+              {
+                "name": "PBI_FormatHint",
+                "value": "{\"isGeneralNumber\":true}"
+              }
+            ],
+            "dataType": "double",
+            "isDataTypeInferred": true,
+            "isNameInferred": true,
+            "lineageTag": "bce20ebc-a1c1-49c0-aba1-2be1ba2f627a",
+            "sourceColumn": "Institut[InstitutsOrder]",
+            "summarizeBy": "sum",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Hex code",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "isNameInferred": true,
+            "lineageTag": "d961c28f-fc12-4a3e-938b-d232e3c6c247",
+            "sourceColumn": "Institut[Hex code]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          }
+        ],
+        "lineageTag": "16beded1-8db7-4649-bf29-e88b5616f8d5",
+        "partitions": [
+          {
+            "name": "Institut Disconnected",
+            "mode": "import",
+            "source": {
+              "expression": "Institut",
+              "type": "calculated"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
